@@ -1,9 +1,10 @@
 # Ignore the following files and directories
 /ejemplo.tif
 /example-use-rasterio.ipynb
-/example-use-rasterio.py
+/example1-raster.ipynb
 /land-13-01701.pdf
 
 # Ignore folder project1.venv
 /project1.venv/
 
+example1-raster.ipynb
