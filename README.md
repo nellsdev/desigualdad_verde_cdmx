@@ -31,8 +31,7 @@ del Valle de México.
 
 ## 🛠️ Stack
 
-Python · Google Earth Engine · GeoPandas · QGIS · Tableau · Google Forms
-
+![Python](https://img.shields.io/badge/Python-%2314354C.svg?style=for-the-badge&logo=python&logoColor=white) · ![GoogleEarthEngine](https://img.shields.io/badge/google%20earth%20engine-%234285F4?style=for-the-badge&logo=googleearthengine&logoColor=white) · ![GeoPandas](https://img.shields.io/badge/GeoPandas--139c5a?style=for-the-badge&logo=geopandas) · ![QGIS](https://img.shields.io/badge/qgis-%2393b023?&style=for-the-badge&logo=qgis&logoColor=white) · ![Tableu](https://img.shields.io/badge/Tableu--blue?style=for-the-badge&logo=tableau) · ![Google Forms](https://img.shields.io/badge/Google%20Forms--8250df?style=for-the-badge&logo=googleforms)
 ## 📅 Roadmap
 
 | Sprint | Semana | Meta |
@@ -46,6 +45,8 @@ Python · Google Earth Engine · GeoPandas · QGIS · Tableau · Google Forms
 
 Nelly Itzel Rodriguez Ortiz — Ingeniera en Computación, MSc. en Microelectrónica
 Especialidad: Análisis de datos y procesamiento de señales
-[Linked In]
+
+<a href="https://www.linkedin.com/in/nellsdev/?locale=en_US"><img src="https://img.shields.io/badge/LinkedIn-Conectemos-0A66C2?style=flat-square&logo=linkedin&logoColor=white"/></a>
+
 
 ---
