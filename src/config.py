@@ -83,6 +83,8 @@ SSP_AER_ID: str = "COPERNICUS/SSP/OFFL/L3_AER_AI"
 # Band names.
 LANDSAT_BAND_THERMAL: str = "ST_B10"
 LANDSAT_BAND_QA: str = "QA_PIXEL"
+LANDSAT_BAND_NIR: str = "SR_B5"   # Near-Infrared (0.85-0.88 um)  — for NDVI
+LANDSAT_BAND_RED: str = "SR_B4"   # Red           (0.64-0.67 um)  — for NDVI
 S5P_BAND_NO2: str = "tropospheric_NO2_column_number_density"
 # L3 NO2 has no qa_value; cloud_fraction is the standard quality proxy.
 S5P_BAND_CLOUDFRAC: str = "cloud_fraction"
@@ -121,5 +123,20 @@ NO2_VIS_PARAMS: dict = {
         "#f46d43",
         "#a50026",
         "#762a83",  # polluted
+    ],
+}
+
+# NDVI — calibrated for CDMX summer 2023.
+# Range -0.1 .. 0.7 captures bare soil (-0.1) to dense vegetation (0.7).
+# Palette: red (no vegetation) -> yellow -> dark green (dense vegetation).
+NDVI_VIS_PARAMS: dict = {
+    "min": -0.1,
+    "max": 0.7,
+    "palette": [
+        "#d7191c",  # bare soil / impervious surface
+        "#fdae61",
+        "#ffffbf",  # sparse vegetation
+        "#a6d96a",
+        "#1a9850",  # dense vegetation
     ],
 }
