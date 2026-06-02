@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project1-islas-calor"
+version = "0.1.0"
+description = "Urban heat islands, air quality, and environmental justice in CDMX"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Nelly Itzel Rodriguez Ortiz" },
+]
+dependencies = [
+    "earthengine-api>=1.5",
+    "geemap>=0.32",
+    "geopandas>=0.14",
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "pandas>=2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ipykernel>=6.0",
+    "jupyter>=1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+exclude = ["data*", "notebooks*", "docs*", "outputs*", "presentación*"]
