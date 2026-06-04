@@ -26,8 +26,7 @@ SHAPEFILE_CDMX_ENT: Path = (
     / "09ent.shp"
 )
 
-# Municipal-level boundaries used to build the ZMVM clipping polygon
-# (16 CDMX alcaldías + 60 EdoMex municipios, CONAPO 2020 delimitation).
+# Municipal-level boundaries (for the ZMVM choropleth and zonal stats).
 SHAPEFILE_CDMX_MUN: Path = (
     PROJECT_ROOT
     / "data"
@@ -47,11 +46,10 @@ SHAPEFILE_EDOMEX_MUN: Path = (
     / "15mun.shp"
 )
 
-# CONAPO 2020 — the 60 Estado de México municipios that, together with the 16
-# CDMX alcaldías, form the Zona Metropolitana del Valle de México (ZMVM).
-# Source: CONAPO "Delimitación de las Zonas Metropolitanas de México", with
-# the 2020 ZMVM revision. Spelling (including diacritics) must match the
-# NOMGEO field of `15mun.shp` exactly.
+# CONAPO 2020 — the 60 Estado de México municipios that form the
+# Zona Metropolitana del Valle de México (ZMVM) together with the 16
+# CDMX alcaldías. Sourced from CONAPO "Delimitación de las zonas
+# metropolitanas de México".
 ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS: tuple[str, ...] = (
     "Acolman", "Amecameca", "Apaxco", "Atenco", "Atizapán de Zaragoza",
     "Atlautla", "Axapusco", "Ayapango", "Coacalco de Berriozábal",
@@ -68,6 +66,7 @@ ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS: tuple[str, ...] = (
     "Tultitlán", "Valle de Chalco Solidaridad", "Villa del Carbón", "Zumpango",
 )
 
+
 # --------------------------------------------------------------------------- #
 # Earth Engine
 # --------------------------------------------------------------------------- #
@@ -76,8 +75,10 @@ ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS: tuple[str, ...] = (
 EE_PROJECT_ID: str = "ee-nrodriguezo2301"
 
 # Collection identifiers.
-LANDSAT_COLLECTION_ID: str = "LANDSAT/LC08/C02/T1_L2"
-S5P_NO2_COLLECTION_ID: str = "COPERNICUS/S5P/OFFL/L3_NO2"
+LANDSAT8_ID: str = "LANDSAT/LC08/C02/T1_L2"
+LANDSAT9_ID: str = "LANDSAT/LC09/C02/T1_L2"
+SSP_NO2_ID: str = "COPERNICUS/SSP/OFFL/L3_NO2"
+SSP_AER_ID: str = "COPERNICUS/SSP/OFFL/L3_AER_AI"
 
 # Band names.
 LANDSAT_BAND_THERMAL: str = "ST_B10"

@@ -22,8 +22,8 @@ def build_dual_map(
     no2_image: ee.Image,
     aoi: ee.FeatureCollection,
     center: list[float] | None = None,
-    zoom: int | None = None,
-) -> "geemap.Map":
+    zoom: int | None = None,) -> "geemap.Map":
+    
     """
     Build a toggleable dual-layer interactive map.
 

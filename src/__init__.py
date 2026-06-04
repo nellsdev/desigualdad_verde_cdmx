@@ -30,7 +30,7 @@ from .config import (
     S5P_BAND_NO2,
     SHAPEFILE_CDMX_ENT,
 )
-from .landsat import calculate_lst, load_lst_composite, mask_landsat_clouds
+from .landsat import calculate_lst, load_lst_composite, mask_clouds_shadows
 from .sentinel5p import load_no2_composite, mask_no2_clouds
 from .visualization import build_dual_map
 
@@ -43,6 +43,7 @@ __all__ = [
     # config
     "PROJECT_ROOT",
     "SHAPEFILE_CDMX_ENT",
+    "ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS",
     "EE_PROJECT_ID",
     "CDMX_CENTER",
     "CDMX_ZOOM",
@@ -51,7 +52,7 @@ __all__ = [
     "S5P_BAND_NO2",
     "S5P_BAND_CLOUDFRAC",
     # landsat
-    "mask_landsat_clouds",
+    "mask_clouds_shadows",
     "calculate_lst",
     "load_lst_composite",
     # sentinel5p

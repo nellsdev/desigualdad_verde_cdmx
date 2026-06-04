@@ -14,17 +14,14 @@ import ee
 from .config import (
     LANDSAT_BAND_QA,
     LANDSAT_BAND_THERMAL,
-    LANDSAT_COLLECTION_ID,
+    LANDSAT8_ID,
+    LANDSAT9_ID,
 )
 
 
-def mask_landsat_clouds(image: ee.Image) -> ee.Image:
+def mask_clouds_shadows(image: ee.Image) -> ee.Image:
     """
     Mask clouds (bit 3) and cloud shadow (bit 4) using the QA_PIXEL bitmask.
-
-    Signal analogy: artifact rejection. Bitwise-AND with 0 means
-    "this pixel is NOT contaminated by clouds or shadow". Pixels that
-    fail the test are dropped via `updateMask`.
 
     Args:
         image: A Landsat 8/9 C02 L2 `ee.Image`. Must contain `QA_PIXEL`.
@@ -48,9 +45,6 @@ def calculate_lst(image: ee.Image) -> ee.Image:
     Formula (Collection 2 scaling):  K = DN * 0.00341802 + 149.0
                                      C = K - 273.15
 
-    Signal analogy: calibration. Converting raw ADC counts to physical
-    units (like converting a 12-bit ADC reading to volts).
-
     Args:
         image: A Landsat 8/9 C02 L2 `ee.Image`. Must contain `ST_B10`.
 
@@ -73,10 +67,6 @@ def load_lst_composite(
     """
     Cloud-masked median Land Surface Temperature composite over the AOI.
 
-    Signal analogy: ERP-style averaging across trials (scenes). Median is
-    robust to residual cloud pixels and to extreme thermal outliers (fires,
-    sensor saturation), unlike the mean.
-
     Args:
         aoi: `ee.FeatureCollection` defining the region of interest.
         start_date: ISO date string, inclusive (e.g. `'2023-06-01'`).
@@ -87,12 +77,19 @@ def load_lst_composite(
         Single-band `ee.Image` (band name `'LST_C'`, degrees Celsius),
         clipped to the AOI.
     """
+    
+    # Load LANDSAT 8 and 9 sataellites and merge them into a single collection.
+    l8 = ee.ImageCollection(LANDSAT8_ID)
+    l9 = ee.ImageCollection(LANDSAT9_ID)
+    landsat_collection = l8.merge(l9)
+
+    # Filter Level 1: Complete Images by AOI, date, and cover clouds (20% threshold is common for LST studies).
+    # Filter Level 2: Pixel Mask clouds and shadows, then calculate LST in Celsius.
     collection = (
-        ee.ImageCollection(LANDSAT_COLLECTION_ID)
-        .filterBounds(aoi)
+        landsat_collection.filterBounds(aoi)
         .filterDate(start_date, end_date)
-        .filterMetadata("CLOUD_COVER", "less_than", cloud_max)
-        .map(mask_landsat_clouds)
+        .filter(ee.Filter.lte("CLOUD_COVER", cloud_max))
+        .map(mask_clouds_shadows)
         .map(calculate_lst)
     )
     return collection.select("LST_C").median().clip(aoi)
