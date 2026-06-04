@@ -17,7 +17,12 @@ import ee
 import geemap
 import geopandas as gpd
 
-from .config import SHAPEFILE_CDMX_ENT
+from .config import (
+    SHAPEFILE_CDMX_ENT,
+    SHAPEFILE_CDMX_MUN,
+    SHAPEFILE_EDOMEX_MUN,
+    ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS,
+)
 
 
 def load_aoi_from_file(shapefile_path: Path) -> ee.FeatureCollection:
@@ -64,3 +69,64 @@ def get_cdmx_aoi(shapefile_path: Path | None = None) -> ee.FeatureCollection:
             "Check that data/raw/shapefiles/09_ciudaddemexico/ is populated."
         )
     return load_aoi_from_file(path)
+
+
+def get_zmvm_municipalities_aoi() -> ee.FeatureCollection:
+    """
+    Return the Zona Metropolitana del Valle de México as a FeatureCollection
+    of 76 municipal polygons: the 16 CDMX alcaldías plus the 60 Estado de
+    México municipios in the CONAPO 2020 delimitation.
+
+    Each feature carries the standard INEGI properties (``CVEGEO``,
+    ``CVE_ENT``, ``CVE_MUN``, ``NOMGEO``) plus a convenient ``entidad``
+    label (``'CDMX'`` or ``'EdoMex'``) for downstream filtering or styling.
+
+    Returns:
+        ``ee.FeatureCollection`` with 76 features, reprojected to WGS84
+        (EPSG:4326) so it can be passed directly to ``clip()`` or
+        ``reduceRegions()``.
+
+    Raises:
+        FileNotFoundError: if either municipal shapefile is missing.
+        ValueError: if the EdoMex filter does not produce exactly 60
+            features (signals a spelling mismatch with the source
+            ``NOMGEO`` field, typically after an INEGI rename).
+    """
+    if not SHAPEFILE_CDMX_MUN.exists():
+        raise FileNotFoundError(
+            f"CDMX municipios shapefile not found at {SHAPEFILE_CDMX_MUN}. "
+            "Check that data/raw/shapefiles/09_ciudaddemexico/ is populated."
+        )
+    if not SHAPEFILE_EDOMEX_MUN.exists():
+        raise FileNotFoundError(
+            f"EdoMex municipios shapefile not found at {SHAPEFILE_EDOMEX_MUN}. "
+            "Check that data/raw/shapefiles/15_mexico/ is populated."
+        )
+
+    import pandas as pd  # local import keeps this module lean
+
+    cdmx = gpd.read_file(SHAPEFILE_CDMX_MUN)
+    edomex = gpd.read_file(SHAPEFILE_EDOMEX_MUN)
+
+    edomex_zmvm = edomex[
+        edomex["NOMGEO"].isin(ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS)
+    ].copy()
+
+    if len(edomex_zmvm) != len(ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS):
+        found = set(edomex_zmvm["NOMGEO"])
+        expected = set(ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS)
+        missing = expected - found
+        raise ValueError(
+            f"Expected {len(ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS)} "
+            f"EdoMex ZMVM municipios, found {len(edomex_zmvm)}. "
+            f"Missing from shapefile: {sorted(missing)}"
+        )
+
+    cdmx = cdmx.assign(entidad="CDMX")
+    edomex_zmvm = edomex_zmvm.assign(entidad="EdoMex")
+
+    combined = pd.concat([cdmx, edomex_zmvm], ignore_index=True)
+    if combined.crs is None:
+        combined = combined.set_crs(epsg=4326)
+    combined = combined.to_crs(epsg=4326)
+    return geemap.gdf_to_ee(combined)

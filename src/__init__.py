@@ -18,7 +18,7 @@ __version__ = "0.1.0"
 
 # Re-export the public API so callers can do:
 #     from src import get_cdmx_aoi, load_lst_composite, ...
-from .aoi import get_cdmx_aoi, load_aoi_from_file
+from .aoi import get_cdmx_aoi, get_zmvm_municipalities_aoi, load_aoi_from_file
 from .config import (
     CDMX_CENTER,
     CDMX_ZOOM,
@@ -38,6 +38,7 @@ __all__ = [
     "__version__",
     # aoi
     "get_cdmx_aoi",
+    "get_zmvm_municipalities_aoi",
     "load_aoi_from_file",
     # config
     "PROJECT_ROOT",

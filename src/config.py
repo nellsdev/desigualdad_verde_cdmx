@@ -26,6 +26,48 @@ SHAPEFILE_CDMX_ENT: Path = (
     / "09ent.shp"
 )
 
+# Municipal-level boundaries used to build the ZMVM clipping polygon
+# (16 CDMX alcaldías + 60 EdoMex municipios, CONAPO 2020 delimitation).
+SHAPEFILE_CDMX_MUN: Path = (
+    PROJECT_ROOT
+    / "data"
+    / "raw"
+    / "shapefiles"
+    / "09_ciudaddemexico"
+    / "conjunto_de_datos"
+    / "09mun.shp"
+)
+SHAPEFILE_EDOMEX_MUN: Path = (
+    PROJECT_ROOT
+    / "data"
+    / "raw"
+    / "shapefiles"
+    / "15_mexico"
+    / "conjunto_de_datos"
+    / "15mun.shp"
+)
+
+# CONAPO 2020 — the 60 Estado de México municipios that, together with the 16
+# CDMX alcaldías, form the Zona Metropolitana del Valle de México (ZMVM).
+# Source: CONAPO "Delimitación de las Zonas Metropolitanas de México", with
+# the 2020 ZMVM revision. Spelling (including diacritics) must match the
+# NOMGEO field of `15mun.shp` exactly.
+ZONE_METROPOLITANA_VALLE_MEXICO_EDOMEX_MUNS: tuple[str, ...] = (
+    "Acolman", "Amecameca", "Apaxco", "Atenco", "Atizapán de Zaragoza",
+    "Atlautla", "Axapusco", "Ayapango", "Coacalco de Berriozábal",
+    "Cocotitlán", "Coyotepec", "Cuautitlán", "Cuautitlán Izcalli", "Chalco",
+    "Chiautla", "Chicoloapan", "Chiconcuac", "Chimalhuacán",
+    "Ecatepec de Morelos", "Ecatzingo", "Huehuetoca", "Hueypoxtla",
+    "Huixquilucan", "Isidro Fabela", "Ixtapaluca", "Jaltenco", "Jilotzingo",
+    "Juchitepec", "La Paz", "Lerma", "Melchor Ocampo", "Naucalpan de Juárez",
+    "Nextlalpan", "Nezahualcóyotl", "Nicolás Romero", "Nopaltepec", "Ocoyoacac",
+    "Otumba", "Ozumba", "Papalotla", "San Martín de las Pirámides", "Tecámac",
+    "Temamatla", "Temascalapa", "Tenango del Aire", "Tenango del Valle",
+    "Teoloyucan", "Tepetlaoxtoc", "Tepetlixpa", "Tepotzotlán", "Tequixquiac",
+    "Texcoco", "Tezoyuca", "Tlalmanalco", "Tlalnepantla de Baz", "Tultepec",
+    "Tultitlán", "Valle de Chalco Solidaridad", "Villa del Carbón", "Zumpango",
+)
+
 # --------------------------------------------------------------------------- #
 # Earth Engine
 # --------------------------------------------------------------------------- #
