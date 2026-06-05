@@ -7,4 +7,23 @@
 # Ignore folder project1.venv
 /project1.venv/
 
-example1-raster.ipynb
+data/*.zip
+
+data/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
