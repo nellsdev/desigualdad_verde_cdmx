@@ -108,11 +108,6 @@ def calculate_ndvi(image: ee.Image) -> ee.Image:
     Range: -1 (water / impervious) to +1 (dense vegetation). Typical
     CDMX summer values: 0.1 (urban) to 0.7 (forest).
 
-    Signal analogy: NDVI is the coherence between the NIR and Red
-    channels — like a normalized cross-correlation between two signals.
-    `normalizedDifference` in GEE handles the divide-by-zero case
-    safely (returns 0 where NIR + Red = 0).
-
     Args:
         image: A Landsat 8/9 C02 L2 `ee.Image`. Must contain `SR_B4`
             and `SR_B5`.
@@ -152,9 +147,12 @@ def load_ndvi_composite(
         Single-band `ee.Image` (band name `'NDVI'`, unitless),
         clipped to the AOI.
     """
+    l8 = ee.ImageCollection(LANDSAT8_ID)
+    l9 = ee.ImageCollection(LANDSAT9_ID)
+    landsat_collection = l8.merge(l9)
+
     collection = (
-        ee.ImageCollection()
-        .filterBounds(aoi)
+        landsat_collection.filterBounds(aoi)
         .filterDate(start_date, end_date)
         .filterMetadata("CLOUD_COVER", "less_than", cloud_max)
         .map(mask_clouds_shadows)

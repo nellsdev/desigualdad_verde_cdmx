@@ -78,6 +78,7 @@ __all__ = [
     "mask_no2_clouds",
     "load_no2_composite",
     # visualization
+    "build_map",
     "build_dual_map",
     "build_triple_map",
 ]

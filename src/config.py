@@ -126,17 +126,18 @@ NO2_VIS_PARAMS: dict = {
     ],
 }
 
-# NDVI — calibrated for CDMX summer 2023.
-# Range -0.1 .. 0.7 captures bare soil (-0.1) to dense vegetation (0.7).
-# Palette: red (no vegetation) -> yellow -> dark green (dense vegetation).
+# NDVI indice 
+# Range 0.2 .. 0.8 captures the full spectrum of vegetation health in CDMX.
+# Range near to 0 or negative captures no vegetation at all (urban,water,bare soil). Range above 0.8 is rare and usually noise (e.g. clouds).
+# Green Palette: 
 NDVI_VIS_PARAMS: dict = {
-    "min": -0.1,
-    "max": 0.7,
+    "min": 0.1,
+    "max": 0.8,
     "palette": [
-        "#d7191c",  # bare soil / impervious surface
-        "#fdae61",
-        "#ffffbf",  # sparse vegetation
-        "#a6d96a",
-        "#1a9850",  # dense vegetation
+        "#ffffff", # no vegetation (white)
+        "#d9ef8b", # sparse vegetation (light green)
+        "#a6d96a", # moderate vegetation (medium green)
+        "#66bd63", # healthy vegetation (dark green)
+        "#1a9850", # very healthy vegetation (darkest green)
     ],
 }
