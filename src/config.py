@@ -134,7 +134,7 @@ NDVI_VIS_PARAMS: dict = {
     "min": 0.1,
     "max": 0.8,
     "palette": [
-        "#ffffff", # no vegetation (white)
+        "#ffffff", # concrete / no vegetation (white)
         "#d9ef8b", # sparse vegetation (light green)
         "#a6d96a", # moderate vegetation (medium green)
         "#66bd63", # healthy vegetation (dark green)
