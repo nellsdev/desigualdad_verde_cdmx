@@ -51,7 +51,7 @@ from .landsat import (
     load_ndvi_composite,
     mask_clouds_shadows,
 )
-#from .sentinel5p import load_no2_composite, mask_no2_clouds
+from .sentinel5p import load_no2_composite, mask_no2_clouds
 from .visualization import build_dual_map, build_triple_map
 
 __all__ = [
