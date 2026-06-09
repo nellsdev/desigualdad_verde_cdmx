@@ -18,7 +18,7 @@ from typing import Optional
 
 import ee
 
-from .config import S5P_BAND_CLOUDFRAC, S5P_BAND_NO2, SSP_NO2_ID
+from .config import S5P_BAND_CLOUDFRAC, S5P_BAND_NO2, S5P_NO2_ID
 
 
 def mask_no2_clouds(image: ee.Image, cloud_max: float = 0.3) -> ee.Image:
@@ -100,7 +100,7 @@ def load_no2_composite(
         cloud_max = 0.3
 
     collection = (
-        ee.ImageCollection(SSP_NO2_ID)
+        ee.ImageCollection(S5P_NO2_ID)
         .filterBounds(aoi)
         .filterDate(start_date, end_date)
         .map(lambda img: mask_no2_clouds(img, cloud_max))
