@@ -131,8 +131,8 @@ LST_VIS_PARAMS: dict = {
 # Tropospheric NO2 column (mol/m^2) — calibrated for CDMX 2023 annual median.
 # Palette: green (clean) -> yellow -> red -> purple (polluted).
 NO2_VIS_PARAMS: dict = {
-    "min": 5.0e-5,
-    "max": 3.0e-4,
+    "min": 2.0e-5,
+    "max": 2.5e-4,
     "palette": [
         "#1a9850",  # clean
         "#a6d96a",
