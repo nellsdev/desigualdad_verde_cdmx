@@ -10,6 +10,8 @@ Modules:
     landsat        Cloud mask + LST calibration + median composite loader.
     sentinel5p     NO2 quality mask + median composite loader.
     visualization  geemap builders, color palettes, colorbar helpers.
+    stations       Ground monitoring station metadata and zone helpers.
+    plot_utils     Matplotlib helpers for zone-coloured charts and WHO lines.
 """
 
 from __future__ import annotations
@@ -53,6 +55,8 @@ from .landsat import (
 )
 from .sentinel5p import load_no2_composite, mask_no2_clouds
 from .visualization import build_dual_map, build_triple_map
+from . import stations
+from . import plot_utils
 
 __all__ = [
     "__version__",
