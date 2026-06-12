@@ -57,6 +57,7 @@ from .sentinel5p import load_no2_composite, mask_no2_clouds
 from .visualization import build_dual_map, build_triple_map
 from . import stations
 from . import plot_utils
+from . import interpolation
 
 __all__ = [
     "__version__",
