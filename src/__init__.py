@@ -58,6 +58,7 @@ from .visualization import build_dual_map, build_triple_map
 from . import stations
 from . import plot_utils
 from . import interpolation
+from . import data_pipeline
 
 __all__ = [
     "__version__",
