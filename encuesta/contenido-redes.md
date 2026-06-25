@@ -3,129 +3,152 @@
 **Proyecto:** IslasCalor — Desigualdad ambiental en la CDMX
 **Encuesta:** Percepción ambiental y salud en la ZMVM (Google Forms, 18 preguntas, ~5 min, anónima)
 **Link:** [LINK AQUÍ]
+**Estética:** Libreta de campo — fotos, stickers, anotaciones cortas manuscritas
 
 ---
 
-## 1. Carrusel Instagram / Facebook — "Dos Méxicos bajo el mismo sol"
+## 1. Carrusel Instagram — Estilo libreta de campo
 
 ### Slide 1 — Portada
 
-**Texto:**
-Dos Méxicos bajo el mismo sol 🌞
+```
+📓 IslasCalor · Bitácora de campo
 
-¿Sabías que el norte de la CDMX puede estar hasta 10 °C más caliente que el sur?
+¿Sabías que el norte de la CDMX
+puede sentirse +10 °C más caliente
+que el sur?
 
-Desliza para entender por qué.
+Estamos armando un diagnóstico
+colaborativo y necesitamos tu ayuda.
 
-**Visual:** Mapa de calor nocturno de la ZMVM con gradiente rojo-naranja-verde. Título grande centrado.
+───
+Deslizá →
+```
 
----
-
-### Slide 2 — El dato de temperatura
-
-**Texto:**
-Mientras el sur de la ciudad respira fresco 🌿…
-
-El norte (Ecatepec, GAM, Nezahualcóyotl, Tlalnepantla) alcanza temperaturas de hasta 35 °C en verano.
-
-El sur se mantiene alrededor de 27 °C.
-
-No es un día caluroso. Es un patrón. (Landsat 8-9, NASA)
-
-**Visual:** Termómetro dividido — lado norte en rojo (35 °C), lado sur en verde (27 °C). Flecha de 8 °C de diferencia.
+**Visual:** Foto de libreta abierta sobre fondo de mapa térmico nocturno de la ZMVM. Título escrito a mano (tipografía manuscrita). Sticker de lupa o termómetro. Post-it: "esto recién empieza".
 
 ---
 
-### Slide 3 — Vegetación y aire
+### Slide 2 — Temperatura (LST satelital)
 
-**Texto:**
-Donde no hay árboles, el calor se queda. Y el aire se contamina.
+```
+🛰️ MIENTRAS EXPLORÁBAMOS
+Landsat 8-9 · NASA · Verano 2025
 
-- NDVI norte: 0.12 (casi sin vegetación)
-- NDVI sur: 0.33 (vegetación moderada)
+NORTE
+Ecatepec, GAM, Neza, Tlalnepantla
+→ 35 °C 🔥
 
-El NO₂ (dióxido de nitrógeno) es 30-50% más alto en el corredor norte.
+SUR
+Coyoacán, Tlalpan, Xochimilco
+→ 27 °C 🌿
 
-Todas las estaciones de monitoreo EXCEDEN los límites de la OMS. (Sentinel-5P ESA, SINAICA)
+⚠️ Lo que nos llamó la atención:
+NO es un día caluroso aislado.
+Es un PATRÓN que se repite.
 
-**Visual:** Comparación lado a lado — foto de colonia del norte (concreto, pocos árboles) vs sur (árboles, áreas verdes). Datos superpuestos.
+Y nos preguntamos: ¿esto afecta
+la vida de quien vive ahí?
+```
 
----
-
-### Slide 4 — Call to action (encuesta)
-
-**Texto:**
-🚨 TÚ VIVES ESTO — Y TU OPINIÓN IMPORTA
-
-¿Cómo es el calor, el aire y tu entorno donde vives?
-
-Estamos levantando una encuesta ciudadana para cruzar lo que dicen los datos satelitales con lo que VIVES cada día.
-
-🗳️ 18 preguntas
-⏱️ 5 minutos
-🔒 Anónima
-
-Tu respuesta ayuda a construir el mapa real de la desigualdad ambiental en la ZMVM.
-
-👉 [LINK AQUÍ]
-
-Comparte con tus vecinos y grupos de tu colonia.
-
-**Visual:** Fondo con mockup de teléfono mostrando formulario. Botón grande "QUIERO PARTICIPAR".
+**Visual:** Mapa de temperatura superficial (LST) de la ZMVM con gradiente rojo-naranja-verde. Círculos rojos marcando el norte, verdes el sur. Sticker de satélite. Anotación manuscrita: "8 °C de diferencia". Post-it: "¿por qué pasa esto?"
 
 ---
 
-### Slide 5 — Quién puede participar
+### Slide 3 — Desigualdad multidimensional (NDVI + contaminación + marginación + salud)
 
-**Texto:**
-¿Vives en la ZMVM? Esta encuesta es para ti.
+```
+🌿 CUANTO MÁS MIRÁBAMOS,
+MÁS COSAS ENCONTRÁBAMOS:
 
-📍 CDMX y EDOMEX
-📱 Tarda 5-6 minutos
-📋 6 secciones: tu perfil, tu colonia, áreas verdes, transporte, emociones y salud
+Menos vegetación en el norte
+NDVI: 0.12 vs 0.33 en el sur
+(incluso los espacios "verdes"
+tienen vegetación pobre o seca)
 
-Especialmente necesitamos respuestas de:
-🔴 Ecatepec, Nezahualcóyotl, GAM, Tlalnepantla, Naucalpan, Iztapalapa
+💨 Más contaminación
+NO₂ satelital 30-50% más alto
+TODAS las estaciones de monitoreo
+EXCEDEN los límites de la OMS
 
-Mientras más respuestas tengamos, más fuerte es la evidencia para exigir acción.
+📊 Más marginación
+Según datos del INEGI y CONAPO:
+las zonas con menos árboles
+tienen mayor marginación
+y más enfermedades respiratorias
 
-**Visual:** Mapa de la ZMVM con las zonas norte resaltadas en rojo/morado. Iconos de check alrededor.
+✏️ TODO ESTO ESTÁ CONECTADO.
+¿Y VOS, LO NOTÁS EN TU DÍA A DÍA?
+```
+
+**Visual:** Collage tipo libreta — foto de calle del norte (concreto, pocos árboles) + foto de área verde descuidada + sticker de contaminación. Flechas conectando conceptos. Anotaciones manuscritas sobreimpresas. Post-it: "nos falta la parte humana →"
 
 ---
 
-### Slide 6 — Cierre
+### Slide 4 — CTA encuesta
 
-**Texto:**
-El cambio empieza con información.
+```
+🗳️ Y ACÁ ES DONDE ENTRAS VOS
 
-Comparte esta encuesta con alguien que viva en el norte de la ciudad.
+Los satélites nos dan datos,
+pero lo que no registran
+es cómo se vive esto CADA DÍA.
 
-Juntos podemos demostrar que la desigualdad ambiental no es un accidente — es una decisión de ciudad. Y puede revertirse.
+Por eso armamos una encuesta
+ciudadana — para que TU experiencia
+complete este diagnóstico.
 
-🌱 #IslasDeCalor #CDMX #JusticiaAmbiental
-🌬️ #Ecatepec #CalidadDelAire
+📝 18 preguntas
+⏱️ 5 minutos · Anónima
+📍 ZMVM — CDMX + EDOMEX
 
-👉 [LINK AQUÍ]
+👉 [LINK]
 
-**Visual:** Foto urbana esperanzadora (árbol entre concreto, atardecer). Logos del proyecto.
+COMPARTÍ CON TUS VECINOS.
+ENTRE MÁS SEAMOS, MÁS COMPLETO
+VA A SER EL MAPA.
+```
+
+**Visual:** Foto de teléfono mostrando el formulario. Sticker de QR. Checklist manuscrita. Post-it pegado con el link. Fondo de libreta con anotaciones.
+
+---
+
+### Slide 5 — Cierre
+
+```
+🌱 ESTO LO ARMAMOS ENTRE TODES
+
+No tenemos todas las respuestas,
+pero cuanto más nos escuchemos,
+más claro va a quedar el panorama.
+
+Si conocés a alguien del norte
+de la ciudad, compartile esto.
+Su experiencia también importa.
+
+#IslasDeCalor #CDMX #JusticiaAmbiental
+#Ecatepec #Nezahualcóyotl #GAM
+
+👉 [LINK EN BIO / HISTORIAS]
+```
+
+**Visual:** Foto de atardecer urbano o árbol creciendo entre concreto. Anotación final manuscrita: "gracias por sumarte 🌱"
 
 ---
 
 **Caption del carrusel:**
 
-¿Sabías que el norte de la CDMX puede estar hasta 10 °C más caliente que el sur? 🔥🌿
+🌡️ ¿Sabías que el norte de la CDMX puede sentirse hasta +10 °C más caliente que el sur? Mientras explorábamos datos satelitales de la NASA y la ESA, nos encontramos con esto — y cuanto más mirábamos, más aparecía.
 
-Datos de satélite de la NASA y la ESA confirman lo que muchos vecinos del norte viven cada día: menos árboles, más calor, más contaminación.
+Menos vegetación, más contaminación, más marginación. Todo en las mismas zonas. Todo conectado.
 
-Ahora queremos escucharte a TI.
+Pero los satélites no registran cómo se vive esto en el día a día. Cuánto tardás en el transporte, si podés ir a un parque, cómo respirás, cómo te sentís al ver tu colonia.
 
-Contesta esta encuesta ciudadana (anónima, 5 min, 18 preguntas) y ayuda a construir el mapa real de la desigualdad ambiental en la ZMVM.
+🗳️ Por eso armamos esta encuesta ciudadana (anónima, 5 minutos, 18 preguntas) — para que tu experiencia complete el diagnóstico. 👉 [LINK AQUÍ]
 
-👉 [LINK AQUÍ]
+Compartí con tus grupos de colonia y vecinos. Esto lo armamos entre todes.
 
-Comparte con tus grupos de colonia y vecinos. Entre más seamos, más fuerte es la voz.
-
-#IslasDeCalor #CDMX #JusticiaAmbiental #Ecatepec #CalidadDelAire #Nezahualcóyotl #GAM #Tlalnepantla #MedioAmbiente
+#IslasDeCalor #CDMX #JusticiaAmbiental #Ecatepec #Nezahualcóyotl #GAM #Tlalnepantla #MedioAmbiente
 
 ---
 
