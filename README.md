@@ -7,8 +7,10 @@
 [![Jupyter](https://img.shields.io/badge/Jupyter-F37626?logo=jupyter&logoColor=white)](https://jupyter.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Status:** Sprint 1 complete — Satellite and ground-level pollution data collected and analyzed.
-> Next: Sprint 2 — Socioeconomic and health data integration.
+> **Status:** *Sprint 2 complete* — Socioeconomic, health, and environmental data integrated and analyzed.
+
+> **Next:** *Sprint 3 in process* — Stadistical analysis and integrated visualization
+
 
 ---
 
@@ -62,6 +64,24 @@ Ground-level particulate matter confirms the satellite picture — and reveals a
 - **GAM (Gustavo A. Madero) bears the highest combined burden** across temperature, vegetation, NO₂, PM₂.₅, and PM₁₀ — the worst environmental conditions in the metropolitan area.
 - The north-south particulate divide mirrors every other indicator exactly.
 
+### 🧭 Marginalization and the Urban Heat Divide
+
+Socioeconomic marginalization is not evenly distributed — and it maps almost perfectly onto the environmental divide.
+
+- **IM_2020 correlates significantly with LST** (p < 0.001) across the metro area — the hottest neighborhoods are the most marginalized.
+- When grouped by actual temperature and green cover (not geography), the "Hot zone" (dense, paved, low vegetation) has **consistently higher marginalization** than the "Cool zone."
+- The north-south temperature divide is simultaneously a **north-south social vulnerability divide**.
+
+### 🏥 The Hidden Health Cost
+
+The environmental and social divides translate into measurable health outcomes when respiratory hospital discharge records are mapped.
+
+- **Respiratory disease follows the same north-south gradient** as temperature, pollution, and marginalization — Ecatepec, Nezahualcóyotl, and Iztapalapa have the highest rates.
+- **OLS regression confirms a significant correlation** between IM_2020 and respiratory discharge rate (r ≈ 0.7). Municipalities above the trend line (Iztapalapa, Ecatepec, GAM, Nezahualcóyotl) align with the worst environmental conditions.
+- The **marginalization–respiratory gradient is monotonic**: "Medio" grade municipios have median rates **1.7× higher** than "Muy bajo" (10,710 vs. 6,336 per 100k).
+- **Green area shows a protective trend**: southern alcaldías with conservation areas (Tlalpan, Milpa Alta, Xochimilco) have both more green space and lower respiratory rates. Conversely, northern municipios with < 5 m² green per capita cluster at the highest rates.
+- The integrated heatmap (6 indicators across 20 municipios) shows that **northern EdoMex and CDMX norte consistently rank worst** across LST, NDVI, NO₂, PM2.5, marginalization, and respiratory health — while **CDMX sur consistently ranks best**.
+
 ### 🔗 The Integrated Pattern
 
 Across **five independent measurements** (LST, NDVI, NO₂, PM₂.₅, PM₁₀), the same geographic story emerges:
@@ -75,6 +95,8 @@ The correlation between environmental variables is so consistent that it points 
 ## Study Area
 
 The Zona Metropolitana del Valle de México (ZMVM): 16 CDMX boroughs + 60 Estado de México municipalities.
+
+Notebooks 01–05 analyze the full ZMVM. Notebook 06 narrows the AOI to 20 municipios (the Periferia Zone: CDMX + 4 northern EdoMex municipios) to match the available respiratory health data.
 
 For comparative analysis, the area is divided into three zones:
 
@@ -92,9 +114,10 @@ For comparative analysis, the area is divided into three zones:
 |--------|------------|---------|
 | **Landsat 8/9** (NASA–USGS) | Land Surface Temperature (LST) in °C, NDVI | Notebooks 01, 02 |
 | **Sentinel-5P TROPOMI** (ESA) | Tropospheric NO₂ column (mol/m²) | Notebook 03 |
-| **SINAICA** (INEEC) | Hourly PM₂.₅, PM₁₀, NO₂ from 13 ground monitoring stations | Notebook 05 |
+| **SINAICA** (INEEC) | Hourly PM₂.₅, PM₁₀, NO₂ from 13 ground monitoring stations | Notebook 04 |
 | **INEGI** (Marco Geoestadístico) | Municipal boundaries (CDMX + EdoMex), AGEB-level geography | All notebooks |
-| **CONAPO** | ZMVM delimitation (76 municipios) | AOI definition |
+| **CONAPO** | ZMVM delimitation (76 municipios); Índice de Marginación (IM_2020) by AGEB | AOI definition, Notebooks 05, 06 |
+| **DGIS** (Secretaría de Salud) | Hospital discharges for respiratory diseases (ICD-10 J00–J99) by AGEB | Notebook 06 |
 
 ---
 
@@ -107,8 +130,9 @@ Work through them in order — each builds on the previous.
 | 01 | [`01_exploration_lst.ipynb`](notebooks/01_exploration_lst.ipynb) | Land Surface Temperature map — CDMX summer vs winter | **5–10 °C gap** between north and south |
 | 02 | [`02_mapping_ndvi.ipynb`](notebooks/02_mapping_ndvi.ipynb) | NDVI vegetation map — 3 zoom levels + LST-NDVI correlation | **r = −0.829** in the concrete belt |
 | 03 | [`03_mapping_no2.ipynb`](notebooks/03_mapping_no2.ipynb) | NO₂ pollution map — 3 zoom levels + NDVI-NO₂ correlation | **NDVI–NO₂ r = −0.384**; north 30–50% more polluted |
-| 04 | *(planned)* | Socioeconomic marginalization (CONAPO) vs environmental variables | — |
-| 05 | [`05_exploration_pm.ipynb`](notebooks/05_exploration_pm.ipynb) | Ground-level PM₂.₅ and PM₁₀ from 13 SINAICA stations | **All stations exceed WHO limits**; GAM bears the highest burden |
+| 04 | [`04_exploration_pm.ipynb`](notebooks/04_exploration_pm.ipynb) | Ground-level PM₂.₅ and PM₁₀ from 13 SINAICA stations | **All stations exceed WHO limits**; GAM bears the highest burden |
+| 05 | [`05_marginacion.ipynb`](notebooks/05_marginacion.ipynb) | Marginalization (CONAPO IM_2020) vs. environmental variables | **IM_2020 correlates with LST** (p < 0.001); north is both hotter and more marginalized |
+| 06 | [`06_salud_respiratoria.ipynb`](notebooks/06_salud_respiratoria.ipynb) | Respiratory disease × marginalization × green space | **Respiratory disease mirrors the environmental divide**; IM → health gradient is monotonic |
 
 ---
 
@@ -123,7 +147,9 @@ Project1-IslasCalor/
 │   ├── 01_exploration_lst.ipynb   # Land Surface Temperature analysis
 │   ├── 02_mapping_ndvi.ipynb      # Vegetation index (NDVI) analysis
 │   ├── 03_mapping_no2.ipynb       # Satellite NO₂ pollution mapping
-│   └── 05_exploration_pm.ipynb    # Ground-level PM₂.₅ / PM₁₀ analysis
+│   ├── 04_exploration_pm.ipynb    # Ground-level PM₂.₅ / PM₁₀ analysis
+│   ├── 05_marginacion.ipynb       # Marginalization × heat analysis
+│   └── 06_salud_respiratoria.ipynb# Respiratory health × environment × marginalization
 ├── src/                           # Reusable Python package (installed editable)
 │   ├── __init__.py                # Public API — re-exports all modules
 │   ├── config.py                  # Paths, EE project ID, band names, vis palettes
@@ -195,7 +221,7 @@ pip install -e .
 jupyter lab
 ```
 
-Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 05).
+Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 04 → 05 → 06).
 
 ---
 
@@ -214,9 +240,9 @@ Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 0
 | Sprint | Dates | Goal | Status |
 |--------|-------|------|--------|
 | 🟢 Sprint 1 | 28 May – 7 Jun | Satellite data (LST, NDVI, NO₂) + ground PM data + survey | ✅ Complete |
-| ⬜ Sprint 2 | 8 – 14 Jun | Socioeconomic marginalization + health data integration | 🔜 Planned |
-| ⬜ Sprint 3 | 15 – 21 Jun | Statistical analysis and integrated visualization | 📅 Future |
-| ⬜ Sprint 4 | 22 – 28 Jun | Dashboard and final narrative | 📅 Future |
+| 🟢 Sprint 2 | 8 – 25 Jun | Socioeconomic marginalization + health data integration | ✅ Complete |
+| 🟡 Sprint 3 | 26 Jun – 9 Jul | Statistical analysis and integrated visualization | 🟡 In progress |
+| ⬜ Sprint 4 | 10 Jul – 23 Jul | Perception survey and final synthesis | 📅 Next |
 
 ---
 
