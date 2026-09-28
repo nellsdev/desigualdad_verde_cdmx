@@ -7,6 +7,14 @@
 # Ignore folder project1.venv
 /project1.venv/
 
+# Local agent tooling (not project source)
+.engram/
+
+# Survey raw responses are NOT published: they contain colonia, age and occupation
+# for 38 identifiable respondents. See README section "Limitations" (item 8).
+encuesta/encuesta-respuestas.csv
+encuesta/DosMexicosbajoSol.csv.zip
+
 data/*.zip
 
 data/
