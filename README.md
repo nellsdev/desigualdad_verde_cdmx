@@ -7,9 +7,9 @@
 [![Jupyter](https://img.shields.io/badge/Jupyter-F37626?logo=jupyter&logoColor=white)](https://jupyter.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Status:** *Sprint 2 complete* — Socioeconomic, health, and environmental data integrated and analyzed.
+> **Status:** *Sprint 3 complete* — Statistical analysis and integrated visualization.
 
-> **Next:** *Sprint 3 in process* — Stadistical analysis and integrated visualization
+> **Next:** *Sprint 4* — Citizen perception survey, interactive dashboard and final synthesis.
 
 
 ---
@@ -61,26 +61,46 @@ Ground-level particulate matter confirms the satellite picture — and reveals a
 | PM₁₀ | 54.3 µg/m³ | 45.1 µg/m³ | 32.8 µg/m³ | 15 µg/m³ |
 
 - **Every single station exceeds the WHO annual guideline** for PM₂.₅ and PM₁₀.
-- **GAM (Gustavo A. Madero) bears the highest combined burden** across temperature, vegetation, NO₂, PM₂.₅, and PM₁₀ — the worst environmental conditions in the metropolitan area.
+- **Gustavo A. Madero (GAM) is among the most burdened municipalities** across temperature, vegetation, NO₂, PM₂.₅ and PM₁₀ — the worst combined environmental conditions in the northern belt. On the project's full six-indicator burden score (which also includes marginalization and respiratory rate) it ranks 4th of 21; see the health section below.
 - The north-south particulate divide mirrors every other indicator exactly.
 
 ### 🧭 Marginalization and the Urban Heat Divide
 
-Socioeconomic marginalization is not evenly distributed — and it maps almost perfectly onto the environmental divide.
+Socioeconomic marginalization is not evenly distributed, and it tends to co-occur with
+environmental burden — though this association is weaker than the environmental signal itself.
 
-- **IM_2020 correlates significantly with LST** (p < 0.001) across the metro area — the hottest neighborhoods are the most marginalized.
-- When grouped by actual temperature and green cover (not geography), the "Hot zone" (dense, paved, low vegetation) has **consistently higher marginalization** than the "Cool zone."
-- The north-south temperature divide is simultaneously a **north-south social vulnerability divide**.
+- **Marginalization (IM_2020) is positively, but not significantly, associated with LST at
+  municipality level** (r = +0.30, n = 21, p ≈ 0.19). The direction matches the hypothesis;
+  with only 21 municipalities the effect cannot be established statistically.
+- When grouped by actual temperature and green cover (rather than geography), the "Hot zone"
+  (dense, paved, low vegetation) shows **higher marginalization** than the "Cool zone".
+- The north–south temperature divide overlaps with a **north–south social vulnerability
+  divide**, but the two are not identical: central boroughs such as Cuauhtémoc carry very high
+  environmental burden without high marginalization.
 
-### 🏥 The Hidden Health Cost
+### 🏥 Respiratory Health: A Weaker Signal Than Hypothesised
 
-The environmental and social divides translate into measurable health outcomes when respiratory hospital discharge records are mapped.
+The project's most ambitious hypothesis was that environmental and social divides translate
+into respiratory health outcomes. The data only partially supports it, and reporting that
+honestly matters as much as reporting the positive findings.
 
-- **Respiratory disease follows the same north-south gradient** as temperature, pollution, and marginalization — Ecatepec, Nezahualcóyotl, and Iztapalapa have the highest rates.
-- **OLS regression confirms a significant correlation** between IM_2020 and respiratory discharge rate (r ≈ 0.7). Municipalities above the trend line (Iztapalapa, Ecatepec, GAM, Nezahualcóyotl) align with the worst environmental conditions.
-- The **marginalization–respiratory gradient is monotonic**: "Medio" grade municipios have median rates **1.7× higher** than "Muy bajo" (10,710 vs. 6,336 per 100k).
-- **Green area shows a protective trend**: southern alcaldías with conservation areas (Tlalpan, Milpa Alta, Xochimilco) have both more green space and lower respiratory rates. Conversely, northern municipios with < 5 m² green per capita cluster at the highest rates.
-- The integrated heatmap (6 indicators across 20 municipios) shows that **northern EdoMex and CDMX norte consistently rank worst** across LST, NDVI, NO₂, PM2.5, marginalization, and respiratory health — while **CDMX sur consistently ranks best**.
+- **At AGEB level (n = 3,419), marginalization and respiratory discharge rate are essentially
+  uncorrelated** (r = −0.06). At municipality level the association is also weak and negative
+  (r = −0.29, n = 21).
+- Grouping AGEBs by CONAPO marginalization grade does **not** produce a monotonic gradient.
+  Median discharge rates per 100k are 17,266 (Muy bajo), 14,153 (Bajo), 16,066 (Medio) and
+  21,961 (Alto). Only the highest grade stands clearly above the others, and the ordering
+  between the lower grades is not stable.
+- **Green area does not show the expected protective association.** Using total green area per
+  municipality, the correlation with respiratory rate is *positive* (r = +0.52); normalising to
+  green area per capita reduces it to near zero (r = +0.12, n = 20). The choice between total
+  area and area per person changes the answer, and neither version supports a clean protective
+  effect in this dataset.
+- The integrated burden ranking (six indicators across **21** municipalities) places
+  **Cuauhtémoc, Azcapotzalco and Benito Juárez** at the top — driven substantially by NO₂ from
+  traffic density — rather than the northern periphery alone. The strongest and most
+  consistent results in this project remain the **environmental** gradients (LST, NDVI, NO₂ and
+  PM), which are mutually corroborating and measured independently of each other.
 
 ### 🔗 The Integrated Pattern
 
@@ -96,7 +116,7 @@ The correlation between environmental variables is so consistent that it points 
 
 The Zona Metropolitana del Valle de México (ZMVM): 16 CDMX boroughs + 60 Estado de México municipalities.
 
-Notebooks 01–05 analyze the full ZMVM. Notebook 06 narrows the AOI to 20 municipios (the Periferia Zone: CDMX + 4 northern EdoMex municipios) to match the available respiratory health data.
+Notebooks 01–05 analyze the full ZMVM. Notebook 06 narrows the AOI to **21 municipios** (the Periferia Zone: 16 CDMX alcaldías + 5 northern EdoMex municipios) to match the available respiratory health data.
 
 For comparative analysis, the area is divided into three zones:
 
@@ -130,7 +150,7 @@ Work through them in order — each builds on the previous.
 | 01 | [`01_exploration_lst.ipynb`](notebooks/01_exploration_lst.ipynb) | Land Surface Temperature map — CDMX summer vs winter | **5–10 °C gap** between north and south |
 | 02 | [`02_mapping_ndvi.ipynb`](notebooks/02_mapping_ndvi.ipynb) | NDVI vegetation map — 3 zoom levels + LST-NDVI correlation | **r = −0.829** in the concrete belt |
 | 03 | [`03_mapping_no2.ipynb`](notebooks/03_mapping_no2.ipynb) | NO₂ pollution map — 3 zoom levels + NDVI-NO₂ correlation | **NDVI–NO₂ r = −0.384**; north 30–50% more polluted |
-| 04 | [`04_exploration_pm.ipynb`](notebooks/04_exploration_pm.ipynb) | Ground-level PM₂.₅ and PM₁₀ from 13 SINAICA stations | **All stations exceed WHO limits**; GAM bears the highest burden |
+| 04 | [`04_exploration_pm.ipynb`](notebooks/04_exploration_pm.ipynb) | Ground-level PM₂.₅ and PM₁₀ from 13 SINAICA stations | **All stations exceed WHO limits**; northern stations are the worst |
 | 05 | [`05_marginacion.ipynb`](notebooks/05_marginacion.ipynb) | Marginalization (CONAPO IM_2020) vs. environmental variables | **IM_2020 correlates with LST** (p < 0.001); north is both hotter and more marginalized |
 | 06 | [`06_salud_respiratoria.ipynb`](notebooks/06_salud_respiratoria.ipynb) | Respiratory disease × marginalization × green space | **Respiratory disease mirrors the environmental divide**; IM → health gradient is monotonic |
 
@@ -241,8 +261,41 @@ Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 0
 |--------|-------|------|--------|
 | 🟢 Sprint 1 | 28 May – 7 Jun | Satellite data (LST, NDVI, NO₂) + ground PM data + survey | ✅ Complete |
 | 🟢 Sprint 2 | 8 – 25 Jun | Socioeconomic marginalization + health data integration | ✅ Complete |
-| 🟡 Sprint 3 | 26 Jun – 9 Jul | Statistical analysis and integrated visualization | 🟡 In progress |
-| ⬜ Sprint 4 | 10 Jul – 23 Jul | Perception survey and final synthesis | 📅 Next |
+| 🟢 Sprint 3 | 26 Jun – 9 Jul | Statistical analysis and integrated visualization | ✅ Complete |
+| 🟡 Sprint 4 | 10 Jul – | Citizen perception survey, interactive dashboard and final synthesis | 🟡 In progress |
+
+---
+
+## Limitations
+
+Honest scope notes. They are part of the result, not caveats to hide.
+
+1. **Two analysis levels are mixed, and they are not interchangeable.** Environmental
+   indicators (notebooks 01–04) are analysed across the full ZMVM. Social and health indicators
+   (notebooks 05–07) are analysed at two different levels: AGEB (n = 3,419) and municipality
+   (n = 21). Correlations computed at these levels are not comparable and can differ in sign.
+   Every correlation reported above states its level and n.
+2. **Small municipality sample.** With n = 21 municipalities and 7 variables, most
+   municipality-level correlations are not statistically distinguishable from zero. Those
+   values are reported for transparency, not as established effects.
+3. **Correlation is not causation.** LST, NDVI and NO₂ co-vary strongly with each other, so
+   their individual contributions cannot be separated without a multivariate design.
+4. **Green-area metric sensitivity.** Results change materially between total green area (m²)
+   and green area per capita. Total area conflates municipality size with green access;
+   per-capita is the more defensible metric and is used where stated.
+5. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
+   individuals. A marginalization–health relationship that appears or disappears at one level
+   may not hold at another.
+6. **Respiratory data coverage.** Hospital discharge records (DGIS, ICD-10 J00–J99) are
+   available only for a subset of ZMVM municipalities, which constrains the health analysis to
+   the Periferia Zone and reduces the effective sample.
+7. **Zone definitions.** The three-zone partitioning (Norte / Centro / Sur) used in notebooks
+   05–07 is a balanced analytical grouping of 7 municipalities each. It does not correspond
+   exactly to the geographic belt description used for the satellite analysis in notebooks
+   01–04, and the two must not be read as the same partition.
+8. **Survey sample.** The citizen perception survey (n = 38) is a pilot and is not
+   statistically representative of the metropolitan area. No quantitative claim in this README
+   rests on it.
 
 ---
 
