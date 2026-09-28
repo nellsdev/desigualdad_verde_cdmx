@@ -52,6 +52,7 @@ SHAPEFILE_EDOMEX_MUN: Path = (
 # metropolitanas de México".
 PERIFERIA_ZMVM: tuple[str, ...] = (
     "Nezahualcóyotl", "Ecatepec de Morelos", "Naucalpan de Juárez", "Tlalnepantla de Baz",
+    "Coacalco de Berriozábal",
 )
 # Northern ZMVM: the concrete belt — 2 CDMX alcaldías + 4 EdoMex municipios.
 # Used for the zoomed-in "ground zero" view in Notebook 02 (Map 2).
