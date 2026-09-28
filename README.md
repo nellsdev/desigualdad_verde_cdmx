@@ -40,7 +40,7 @@ The north has **significantly less vegetation** — and the correlation with tem
 
 - **Nororiente mean NDVI:** 0.12 (barely above "sparse vegetation")
 - **South mean NDVI:** 0.33 (moderate / healthy vegetation)
-- **LST–NDVI correlation in the concrete belt: r = −0.829** — vegetation explains nearly 70% of the temperature gap in the most urbanized areas.
+- **LST–NDVI correlation in the concrete belt: r = −0.829** (notebook 02, belt subset — the 21-municipality matrix in notebook 07 gives r = −0.936) — vegetation accounts for roughly 70% of the temperature variance in the most urbanized areas.
 
 ### 💨 NO₂ Pollution (Satellite — Sentinel-5P TROPOMI)
 
@@ -108,7 +108,7 @@ Across **five independent measurements** (LST, NDVI, NO₂, PM₂.₅, PM₁₀)
 
 > **The less-green north is also the hotter north, the more polluted north, and the north with worse air quality by every metric.**
 
-The correlation between environmental variables is so consistent that it points to a single underlying cause: **unequal distribution of green infrastructure across the metropolitan area.**
+The correlation between environmental variables is so consistent that it points to a common underlying factor: **the unequal distribution of green infrastructure across the metropolitan area.** This remains a hypothesis rather than a demonstrated cause — see Limitations.
 
 ---
 
@@ -148,11 +148,11 @@ Work through them in order — each builds on the previous.
 | # | Notebook | What it does | Key finding |
 |---|----------|-------------|-------------|
 | 01 | [`01_exploration_lst.ipynb`](notebooks/01_exploration_lst.ipynb) | Land Surface Temperature map — CDMX summer vs winter | **5–10 °C gap** between north and south |
-| 02 | [`02_mapping_ndvi.ipynb`](notebooks/02_mapping_ndvi.ipynb) | NDVI vegetation map — 3 zoom levels + LST-NDVI correlation | **r = −0.829** in the concrete belt |
+| 02 | [`02_mapping_ndvi.ipynb`](notebooks/02_mapping_ndvi.ipynb) | NDVI vegetation map — 3 zoom levels + LST-NDVI correlation | **r = −0.829** in the concrete belt (belt subset; 21-municipality matrix: −0.936) |
 | 03 | [`03_mapping_no2.ipynb`](notebooks/03_mapping_no2.ipynb) | NO₂ pollution map — 3 zoom levels + NDVI-NO₂ correlation | **NDVI–NO₂ r = −0.384**; north 30–50% more polluted |
 | 04 | [`04_exploration_pm.ipynb`](notebooks/04_exploration_pm.ipynb) | Ground-level PM₂.₅ and PM₁₀ from 13 SINAICA stations | **All stations exceed WHO limits**; northern stations are the worst |
-| 05 | [`05_marginacion.ipynb`](notebooks/05_marginacion.ipynb) | Marginalization (CONAPO IM_2020) vs. environmental variables | **IM_2020 correlates with LST** (p < 0.001); north is both hotter and more marginalized |
-| 06 | [`06_salud_respiratoria.ipynb`](notebooks/06_salud_respiratoria.ipynb) | Respiratory disease × marginalization × green space | **Respiratory disease mirrors the environmental divide**; IM → health gradient is monotonic |
+| 05 | [`05_marginacion.ipynb`](notebooks/05_marginacion.ipynb) | Marginalization (CONAPO IM_2020) vs. environmental variables | **IM_2020 vs. LST: r = +0.30, not significant at n = 21**; the north is both hotter and more marginalized |
+| 06 | [`06_salud_respiratoria.ipynb`](notebooks/06_salud_respiratoria.ipynb) | Respiratory disease × marginalization × green space | **Respiratory health does not follow the environmental gradient** (r = −0.06 at AGEB level); see Limitations |
 
 ---
 
@@ -296,6 +296,11 @@ Honest scope notes. They are part of the result, not caveats to hide.
 8. **Survey sample.** The citizen perception survey (n = 38) is a pilot and is not
    statistically representative of the metropolitan area. No quantitative claim in this README
    rests on it.
+9. **One figure is not yet reproduced.** The `r = −0.829` LST–NDVI correlation reported for the
+   concrete belt comes from notebook 02, which requires the satellite pipeline to re-run. It
+   cannot currently be re-derived from the exported files in this repository, and the
+   municipality-level matrix gives a different value (−0.936) for a different sample. Treat the
+   belt figure as provisional until notebook 02 is re-executed and the value is frozen.
 
 ---
 
