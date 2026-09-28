@@ -4,3 +4,6 @@ geopandas>=0.14
 matplotlib>=3.8
 numpy>=1.26
 pandas>=2.1
+
+# Dashboard (see dashboards/requirements.txt for the minimal deploy set)
+streamlit>=1.30
