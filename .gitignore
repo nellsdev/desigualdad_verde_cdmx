@@ -15,9 +15,11 @@
 encuesta/encuesta-respuestas.csv
 encuesta/DosMexicosbajoSol.csv.zip
 
-data/*.zip
-
-data/
+# Top-level raw/processed geodata only. The leading slash anchors the rule to the
+# repository root: without it, dashboards/data/ (the aggregated CSVs the deployed
+# dashboard reads) would also be excluded and the Streamlit app would break.
+/data/*.zip
+/data/
 
 # Python build artifacts
 __pycache__/
