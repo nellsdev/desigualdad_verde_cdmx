@@ -1,9 +1,11 @@
-earthengine-api>=1.5
-geemap>=0.32
-geopandas>=0.14
-matplotlib>=3.8
-numpy>=1.26
-pandas>=2.1
-
-# Dashboard (see dashboards/requirements.txt for the minimal deploy set)
+# Deploy-time dependencies for the Streamlit report in dashboards/.
+#
+# The report renders pre-generated images and one summary table, so it needs
+# none of the geospatial stack -- which keeps the Streamlit Community Cloud
+# build fast and avoids pulling GDAL in for a page of charts.
+#
+# The analysis stack (earthengine-api, geemap, geopandas, matplotlib, pykrige)
+# is declared in pyproject.toml and installed with `pip install -e .`.
 streamlit>=1.30
+pandas>=2.1
+numpy>=1.26

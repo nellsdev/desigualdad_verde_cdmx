@@ -9,7 +9,7 @@
 
 > **Status:** *Sprint 3 complete* — Statistical analysis and integrated visualization.
 
-> **Next:** *Sprint 4* — Citizen perception survey, interactive dashboard and final synthesis.
+> **Next:** *Sprint 4* — Citizen perception survey, dashboard and final synthesis.
 
 
 ---
@@ -184,8 +184,8 @@ Project1-IslasCalor/
 ├── docs/                          # Reference material
 ├── encuesta/                      # Citizen perception survey
 ├── presentación/                  # Presentation materials
-├── pyproject.toml                 # Package metadata + dependencies
-├── requirements.txt               # Pinned runtime dependencies
+├── pyproject.toml                 # Package metadata + the analysis dependency stack
+├── requirements.txt               # Deploy-time dependencies for the dashboard only
 └── README.md                      # This file
 ```
 
@@ -245,6 +245,28 @@ Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 0
 
 ---
 
+## Dashboard
+
+A Streamlit report that renders the project's map gallery and the municipality summary table.
+
+**It is a styled static report, not an interactive dashboard.** There are no filters,
+selectors or parameter controls — the app contains six `st.image` calls and one `st.dataframe`.
+Every figure is pre-rendered by notebook 07 and committed to `outputs/graficos/`, so the app
+needs neither the analysis stack nor Earth Engine access to run.
+
+```bash
+streamlit run dashboards/app.py
+```
+
+`dashboards/data/*.csv` holds the aggregated tables that notebook 07 exports. **The app does not
+read them** — they are committed so that every correlation reported in this README can be
+recomputed from the repository without re-running the pipeline.
+
+Deploy dependencies live in `requirements.txt` (streamlit, pandas, numpy). The analysis stack
+lives in `pyproject.toml` and is installed with `pip install -e .`.
+
+---
+
 ## Code Conventions
 
 - All reusable logic lives in `src/`. Notebooks only orchestrate the pipeline — no logic in notebook cells.
@@ -265,7 +287,7 @@ Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 0
 | 🟢 Sprint 1 | 28 May – 7 Jun | Satellite data (LST, NDVI, NO₂) + ground PM data + survey | ✅ Complete |
 | 🟢 Sprint 2 | 8 – 25 Jun | Socioeconomic marginalization + health data integration | ✅ Complete |
 | 🟢 Sprint 3 | 26 Jun – 9 Jul | Statistical analysis and integrated visualization | ✅ Complete |
-| 🟡 Sprint 4 | 10 Jul – | Citizen perception survey, interactive dashboard and final synthesis | 🟡 In progress |
+| 🟡 Sprint 4 | 10 Jul – | Citizen perception survey, dashboard and final synthesis | 🟡 In progress |
 
 ---
 
