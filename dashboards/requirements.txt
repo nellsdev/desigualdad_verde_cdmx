@@ -1,6 +1,6 @@
 # Minimal runtime dependencies for the Streamlit dashboard.
 # The notebooks need the heavier geospatial stack (see the repository root
 # requirements.txt); the deployed dashboard only needs these three.
-streamlit>=1.30
+streamlit>=1.49
 pandas>=2.1
 numpy>=1.26
