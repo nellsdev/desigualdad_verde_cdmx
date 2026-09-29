@@ -56,7 +56,7 @@ def main() -> None:
     print("Merging PM2.5/PM10 from ground stations...")
     pm_path = PROJECT_ROOT / "data" / "processed" / "ground_stations_annual_2023.csv"
     st = pd.read_csv(pm_path)
-    st = st[st["annual_mean"] > 0]
+    st = st[st["annual_mean"] > 1.0]
 
     station_to_municipio = {
         name: meta["municipio"] for name, meta in STATIONS_META.items()
@@ -96,6 +96,81 @@ def main() -> None:
     out_path = PROJECT_ROOT / "data" / "processed" / "municipio_indicators.csv"
     df.to_csv(out_path, index=False)
     print(f"\nSaved to {out_path}")
+
+    # ── Spatial interpolation for NaN PM values ──────────────────────────
+    n_nan_pm25 = df["pm25_mean"].isna().sum()
+    n_nan_pm10 = df["pm10_mean"].isna().sum()
+    if n_nan_pm25 > 0 or n_nan_pm10 > 0:
+        print(f"\n{n_nan_pm25} PM2.5 + {n_nan_pm10} PM10 NaN — running Ordinary Kriging...")
+        _kriging_interpolate(df, out_path)
+
+
+def _kriging_interpolate(df: pd.DataFrame, out_path: Path) -> None:
+    """Fill remaining NaN PM values via Ordinary Kriging from station data."""
+    import numpy as np
+    from pykrige.ok import OrdinaryKriging
+
+    from src.interpolation import prepare_station_data
+    from src.stations import STATIONS_META
+
+    pm_path = out_path.parent / "ground_stations_annual_2023.csv"
+    annual_stats = pd.read_csv(pm_path)
+
+    # Centroids from shapefiles
+    from src.config import PERIFERIA_ZMVM
+
+    CDMX_SHP = (
+        PROJECT_ROOT / "data/raw/shapefiles/09_ciudaddemexico"
+        / "conjunto_de_datos" / "09mun.shp"
+    )
+    EDOMEX_SHP = (
+        PROJECT_ROOT / "data/raw/shapefiles/15_mexico"
+        / "conjunto_de_datos" / "15mun.shp"
+    )
+    import geopandas as gpd
+
+    cdmx = gpd.read_file(CDMX_SHP)
+    edomex = gpd.read_file(EDOMEX_SHP)
+    edomex_study = edomex[edomex["NOMGEO"].isin(PERIFERIA_ZMVM)].copy()
+    gdf = pd.concat([cdmx, edomex_study], ignore_index=True)
+    gdf["centroid"] = gdf.geometry.centroid
+    gdf["clon"] = gdf["centroid"].x
+    gdf["clat"] = gdf["centroid"].y
+
+    centroids: dict[str, tuple[float, float]] = {}
+    for _, row in gdf.iterrows():
+        centroids[row["NOMGEO"].strip()] = (row["clon"], row["clat"])
+
+    for pol_col, pol_name in [("pm25_mean", "PM2.5"), ("pm10_mean", "PM10")]:
+        missing = df[df[pol_col].isna()]["NOM_MUN"].tolist()
+        if not missing:
+            continue
+
+        stn_df = prepare_station_data(annual_stats, pol_name, STATIONS_META)
+        stn_df = stn_df[stn_df["value"] >= 1.0]
+        if stn_df.empty:
+            continue
+
+        ok = OrdinaryKriging(
+            stn_df["lng"].values, stn_df["lat"].values, stn_df["value"].values,
+            variogram_model="spherical", verbose=False,
+        )
+
+        print(f"  {pol_name}: kriging for {missing}")
+        for mun in missing:
+            key = mun.strip()
+            if key not in centroids:
+                continue
+            clon, clat = centroids[key]
+            try:
+                z, _ = ok.execute("points", np.array([clon]), np.array([clat]))
+                pred = float(z.ravel()[0]) if isinstance(z, np.ndarray) else float(z)
+            except Exception:
+                pred = float("nan")
+            df.loc[df["NOM_MUN"] == mun, pol_col] = pred
+
+    df.to_csv(out_path, index=False)
+    print(f"  Saved with kriged values. Remaining NaN: PM2.5={df['pm25_mean'].isna().sum()}, PM10={df['pm10_mean'].isna().sum()}")
 
 
 if __name__ == "__main__":

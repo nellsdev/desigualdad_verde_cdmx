@@ -1,0 +1,6 @@
+,lst_mean,lst_mean,ndvi_mean,ndvi_mean,no2_mean,no2_mean,pm25_mean,pm25_mean,imn_mean,imn_mean,tasa_respiratoria,tasa_respiratoria,area_verde_total_m2,area_verde_total_m2
+,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std
+zona,,,,,,,,,,,,,,
+Centro,36.105,3.605,0.115,0.045,0.0,0.0,17.857,1.828,0.958,0.011,12614.797,9829.237,6515412.721,5516051.306
+Norte,35.877,3.28,0.144,0.052,0.0,0.0,18.932,1.755,0.953,0.007,12735.992,8793.121,5073530.02,7205356.075
+Sur,26.676,4.809,0.239,0.046,0.0,0.0,16.906,1.825,0.95,0.011,7736.61,4743.426,8113103.12,10630788.752

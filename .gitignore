@@ -7,9 +7,19 @@
 # Ignore folder project1.venv
 /project1.venv/
 
-data/*.zip
+# Local agent tooling (not project source)
+.engram/
 
-data/
+# Survey raw responses are NOT published: they contain colonia, age and occupation
+# for 34 identifiable respondents. See README section "Limitations" (item 11).
+encuesta/encuesta-respuestas.csv
+encuesta/DosMexicosbajoSol.csv.zip
+
+# Top-level raw/processed geodata only. The leading slash anchors the rule to the
+# repository root: without it, dashboards/data/ (the aggregated CSVs the deployed
+# dashboard reads) would also be excluded and the Streamlit app would break.
+/data/*.zip
+/data/
 
 # Python build artifacts
 __pycache__/
@@ -27,3 +37,5 @@ dist/
 .idea/
 .DS_Store
 *.swp
+# Local Pi runtime state
+.atl/

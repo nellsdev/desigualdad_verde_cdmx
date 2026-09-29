@@ -52,6 +52,7 @@ SHAPEFILE_EDOMEX_MUN: Path = (
 # metropolitanas de México".
 PERIFERIA_ZMVM: tuple[str, ...] = (
     "Nezahualcóyotl", "Ecatepec de Morelos", "Naucalpan de Juárez", "Tlalnepantla de Baz",
+    "Coacalco de Berriozábal",
 )
 # Northern ZMVM: the concrete belt — 2 CDMX alcaldías + 4 EdoMex municipios.
 # Used for the zoomed-in "ground zero" view in Notebook 02 (Map 2).
@@ -113,7 +114,8 @@ S5P_BAND_CLOUDFRAC: str = "cloud_fraction"
 CDMX_CENTER: list[float] = [19.4326, -99.1332]
 CDMX_ZOOM: int = 11
 
-# Land Surface Temperature (Celsius) — calibrated for CDMX summer 2023.
+# Land Surface Temperature (Celsius) — palette range for the summer composite.
+# The year is set per notebook via start_date / end_date (see notebooks 01–02).
 # Palette: cool -> warm -> hot (ColorBrewer "RdYlBu" reversed).
 LST_VIS_PARAMS: dict = {
     "min": 22.0,
@@ -128,7 +130,8 @@ LST_VIS_PARAMS: dict = {
     ],
 }
 
-# Tropospheric NO2 column (mol/m^2) — calibrated for CDMX 2023 annual median.
+# Tropospheric NO2 column (mol/m^2) — palette range for the annual median.
+# The year is set per notebook via start_date / end_date (see notebook 03).
 # Palette: green (clean) -> yellow -> red -> purple (polluted).
 NO2_VIS_PARAMS: dict = {
     "min": 2.0e-5,

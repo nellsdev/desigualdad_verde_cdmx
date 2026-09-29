@@ -32,19 +32,26 @@ import requests
 # --------------------------------------------------------------------------- #
 
 STATION_IDS: dict[str, int] = {
-    "Nezahualcoyotl": 258,
-    "GAM": 302,
-    "Iztapalapa": 268,
-    "Centro": 256,
-    "Pedregal": 259,
-    "Ecatepec": 271,
-    "Tlalnepantla": 266,
-    "Naucalpan": 243,
-    "CCA": 245,
-    "UAM Xochimilco": 269,
-    "Benito Juárez": 300,
-    "Hospital General": 251,
     "Ajusco Medio": 242,
+    "Benito Juárez": 300,
+    "Camarones": 244,
+    "CCA": 245,
+    "Centro": 256,
+    "Cuajimalpa": 248,
+    "Ecatepec": 271,
+    "GAM": 302,
+    "Hospital General": 251,
+    "Iztacalco": 252,
+    "Iztapalapa": 268,
+    "Miguel Hidalgo": 263,
+    "Milpa Alta": 299,
+    "Naucalpan": 243,
+    "Nezahualcoyotl": 258,
+    "Pedregal": 259,
+    "Tlahuac": 265,
+    "Tlalnepantla": 266,
+    "UAM Xochimilco": 269,
+    "Villa de las Flores": 270,
 }
 """Mapping of common station names to SINAICA identifiers.
 
@@ -57,6 +64,13 @@ Notes
   monitoring site in the Valle de México network.
 - Hospital General (HGM) is the Hospital General de México in Cuauhtémoc.
 - Ajusco Medio (AJM) is in the Tlalpan borough, southern CDMX.
+- Villa de las Flores (VIF) is the Coacalco de Berriozábal station in the Estado de México.
+- Camarones (CAM) is in the Azcapotzalco borough of CDMX.
+- Cuajimalpa (CUA) is in the Cuajimalpa de Morelos borough of CDMX.
+- Iztacalco (IZT) is in the Iztacalco borough of CDMX.
+- Miguel Hidalgo (MGH) is in the Miguel Hidalgo borough of CDMX.
+- Milpa Alta (MPA) is in the Milpa Alta borough of CDMX.
+- Tlahuac (TLH) is in the Tláhuac borough of CDMX.
 """
 
 STATION_NAMES: dict[int, str] = {v: k for k, v in STATION_IDS.items()}
