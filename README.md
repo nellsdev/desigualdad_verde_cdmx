@@ -335,9 +335,13 @@ that shaped the design; the rest bound how far the results can be pushed.
     so the source figure may be counting outpatient episodes rather than discharges. This must be
     checked against the DGIS data dictionary before any health *level* is quoted; the
     correlation results do not depend on the level being correct, only on the ranking.
-11. **Survey sample.** The citizen perception survey (n = 38) is a pilot and is not
-    statistically representative of the metropolitan area. No quantitative claim in this README
-    rests on it.
+11. **Survey sample.** The citizen perception survey has **34 responses spread over 16
+    municipalities** — a median of 2 per municipality. It is a pilot, it is not statistically
+    representative at any geographic level used in this README, and no quantitative claim here
+    rests on it. Two further constraints: 4 of the 16 municipalities named by respondents
+    (Zumpango, Atizapán de Zaragoza, Nicolás Romero, La Paz) fall outside the 21-municipality
+    Periferia zone used for the analysis, and analysing the perception items by zone would need
+    at least an order of magnitude more responses.
 12. **One figure is not yet reproduced.** The `r = −0.829` LST–NDVI correlation reported for the
     concrete belt comes from notebook 02, which samples 400 pixels through Earth Engine and does
     not persist them. It cannot currently be re-derived from the exported files in this
