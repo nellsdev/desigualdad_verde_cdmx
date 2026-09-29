@@ -1,0 +1,15 @@
+[theme]
+# The charts are exported with a white background, so a light base keeps the
+# app and the embedded images on the same canvas. Without this the app follows
+# the visitor's OS theme and the images become white cards on a dark page.
+base = "light"
+primaryColor = "#C0392B"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F6F6F4"
+textColor = "#1A1A1A"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false
