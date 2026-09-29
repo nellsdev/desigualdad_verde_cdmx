@@ -311,10 +311,18 @@ that shaped the design; the rest bound how far the results can be pushed.
    notebooks 01–04.
 6. **Correlation is not causation.** LST, NDVI and NO₂ co-vary strongly with each other, so
    their individual contributions cannot be separated without a multivariate design.
-7. **Green-area metric sensitivity.** Results change materially between total green area (m²)
-   and green area per capita. Total area conflates municipality size with green access;
-   per-capita is the more defensible metric and is used where stated. The correlation matrix
-   uses the total, which is why the green-area row reads against the project's narrative.
+7. **The green-area metric does not measure recreational space.** `area_verde_total_m2` sums
+   the `superficie` of every polygon in the SEDEMA green-area inventory that intersects an
+   AGEB, **with no filter on the `categoria` field**. Of the 67.3 km² summed, only 29.2% is
+   recreational (parks, alamedas, plazas, gardens); 42.3% is vegetation inside urban
+   facilities (school grounds, housing units, assistance centres) and 14.2% is road verges and
+   medians. A camellón along an avenue counts exactly as much as a park. The metric therefore
+   tracks road and facility density at least as much as it tracks green space, which is the
+   most likely reason its correlation with respiratory rate comes out *positive* (+0.522):
+   more road frontage means more traffic and worse air. Converting to per capita (+0.115) does
+   not repair the metric, only rescales it. Re-aggregating from the recreational categories
+   only — and adding distance to the nearest park as an accessibility measure — is the next
+   step, and it may change the sign.
 8. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
    individuals. A marginalization–health relationship that appears or disappears at one level
    may not hold at another.
