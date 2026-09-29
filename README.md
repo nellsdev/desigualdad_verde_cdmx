@@ -333,18 +333,30 @@ that shaped the design; the rest bound how far the results can be pushed.
    notebooks 01–04.
 6. **Correlation is not causation.** LST, NDVI and NO₂ co-vary strongly with each other, so
    their individual contributions cannot be separated without a multivariate design.
-7. **The green-area metric does not measure recreational space.** `area_verde_total_m2` sums
-   the `superficie` of every polygon in the SEDEMA green-area inventory that intersects an
-   AGEB, **with no filter on the `categoria` field**. Of the 67.3 km² summed, only 29.2% is
-   recreational (parks, alamedas, plazas, gardens); 42.3% is vegetation inside urban
-   facilities (school grounds, housing units, assistance centres) and 14.2% is road verges and
-   medians. A camellón along an avenue counts exactly as much as a park. The metric therefore
-   tracks road and facility density at least as much as it tracks green space, which is the
-   most likely reason its correlation with respiratory rate comes out *positive* (+0.522):
-   more road frontage means more traffic and worse air. Converting to per capita (+0.115) does
-   not repair the metric, only rescales it. Re-aggregating from the recreational categories
-   only — and adding distance to the nearest park as an accessibility measure — is the next
-   step, and it may change the sign.
+7. **The green-area metric is not usable outside CDMX, and does not measure recreational
+   space.** `area_verde_total_m2` sums the SEDEMA green-area inventory intersecting each AGEB,
+   with two independent defects:
+
+   *Coverage.* The inventory covers **only the 16 CDMX alcaldías** (`cve_delg` runs 1–16). The
+   five Estado de México municipios in the study area have essentially no recorded green area:
+   Coacalco 0 m², Ecatepec 5,581 m², Tlalnepantla 137,973 m² and Naucalpan 642,124 m², against a
+   median of **5.35 km² for the CDMX alcaldías**. That is a coverage gap, not an absence of
+   parks, and it invalidates any ZMVM-wide correlation involving this column. Those five
+   municipios all fall in the Norte zone.
+
+   *Category.* Of the 67.2 km² summed, only **29.3 % is recreational** (parks, alamedas, plazas,
+   gardens); 42 % is vegetation inside urban facilities (school grounds, housing units,
+   assistance centres) and 14 % is road verges and medians. A camellón along an avenue counts as
+   much as a park.
+
+   Filtering to recreational categories does flip the AGEB-level sign (+0.013 → −0.011), which
+   confirms the category defect — but every correlation remains indistinguishable from zero, and
+   the coverage gap cannot be filtered away. **`area_verde_total_m2` should not be used for the
+   21-municipality analysis.** The green measure with full ZMVM coverage is **NDVI from Landsat**,
+   and it is what this README uses: r = −0.301 with respiratory rate and r = −0.372 with
+   marginalization — both in the expected direction, neither significant at n = 21. **No
+   AGEB-level green–health test has been run validly**, because the only green variable available
+   per AGEB is the inventory one.
 8. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
    individuals. A marginalization–health relationship that appears or disappears at one level
    may not hold at another.
