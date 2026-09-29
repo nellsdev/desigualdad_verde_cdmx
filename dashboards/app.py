@@ -156,7 +156,7 @@ with right:
     st.image(
         str(MAPAS / "no2_zmvm.png"),
         caption="NO₂ troposférico en la ZMVM — Sentinel-5P TROPOMI (ESA). Las zonas rojas son las más contaminadas.",
-        use_container_width=True,
+        width="stretch",
     )
 
 st.divider()
@@ -179,21 +179,22 @@ with col_lst:
     st.image(
         str(MAPAS / "lst_chart_zmvm.png"),
         caption="Temperatura superficial (Landsat 8/9). El norte promedia ~35 °C, el sur ~27 °C.",
-        use_container_width=True,
+        width="stretch",
     )
 
 with col_ndvi:
     st.image(
         str(MAPAS / "ndvi_chart_zmvm.png"),
         caption="Índice de vegetación NDVI. El norte tiene menos de la mitad de vegetación que el sur.",
-        use_container_width=True,
+        width="stretch",
     )
 
 st.markdown(
     """
     <div class="key-finding">
-        <strong>Correlación LST–NDVI en el cinturón de concreto: r = −0.829</strong><br>
-        La vegetación explica casi el 70% de la brecha de temperatura en las zonas más urbanizadas.
+        <strong>Correlación LST–NDVI: r = −0.936 a nivel municipio (n = 21)</strong><br>
+        En el cinturón de concreto, medido por muestreo de 400 píxeles en el notebook 02,
+        la correlación reportada es r = −0.829 — pendiente de reproducir (ver Limitaciones).
         Donde no hay árboles, el calor se queda.
     </div>
     """,
@@ -220,14 +221,14 @@ with col_no2:
     st.image(
         str(MAPAS / "no2_chart_zmvm.png"),
         caption="NO₂ satelital (Sentinel-5P). El norte tiene 30–50% más NO₂ que el sur.",
-        use_container_width=True,
+        width="stretch",
     )
 
 with col_pm:
     st.image(
         str(MAPAS / "pm_chart_zmvm.png"),
         caption="Material particulado (PM₂.₅ y PM₁₀) en estaciones SINAICA.",
-        use_container_width=True,
+        width="stretch",
     )
 
 st.markdown(
@@ -261,7 +262,7 @@ with left:
     st.image(
         str(MAPAS / "marginacion_zmvm.png"),
         caption="Índice de Marginación (CONAPO) por municipio. Las zonas más calientes son las más marginadas.",
-        use_container_width=True,
+        width="stretch",
     )
 
 with right:
@@ -269,19 +270,20 @@ with right:
         """
         ### Hallazgos clave
         
-        - **IM_2020 correlaciona significativamente con LST** (p < 0.001) — los vecindarios
-          más calientes son los más marginados.
+        - **IM_2020 y LST: r = +0.30, no significativo con n = 21 municipios.** La dirección
+          acompaña la hipótesis, pero la muestra municipal no alcanza para sostenerla.
         
-        - **La gradiente marginación–salud respiratoria es monotónica:** municipios con
-          marginación "Media" tienen tasas de enfermedad respiratoria **1.7× más altas**
-          que los de marginación "Muy baja".
+        - **La gradiente marginación–salud respiratoria NO es monotónica.** Las medianas por
+          grado de marginación son 17,266 (Muy bajo), 14,153 (Bajo), 16,066 (Medio) y 21,961
+          (Alto) por 100 mil habitantes. Solo el grado "Alto" se despega del resto.
         
-        - **El área verde muestra un efecto protector:** las alcaldías del sur con áreas
-          de conservación (Tlalpan, Milpa Alta, Xochimilco) tienen más espacio verde y
-          menores tasas respiratorias.
+        - **El área verde no muestra un efecto protector con esta métrica.** La correlación con
+          la tasa respiratoria es *positiva* (r = +0.52) porque la métrica suma todo el
+          inventario de áreas verdes, camellones e instalaciones incluidos.
         
-        - **Correlación IM–tasa respiratoria: r ≈ 0.7** — la desigualdad social es
-          también desigualdad ambiental y de salud.
+        - **Correlación marginación–tasa respiratoria: r = −0.06 a nivel AGEB (n = 3,419).**
+          Prácticamente nula. La desigualdad ambiental está bien medida; su vínculo con la
+          salud respiratoria, no.
         """
     )
 
@@ -301,68 +303,66 @@ st.markdown(
 )
 
 # --- INTEGRATED BURDEN TABLE ---
-# Data from the README findings — municipios ranked by integrated burden
-burden_data = {
-    "Municipio": [
-        "Gustavo A. Madero",
-        "Ecatepec de Morelos",
-        "Nezahualcóyotl",
-        "Iztapalapa",
-        "Tlalnepantla de Baz",
-        "Naucalpan de Juárez",
-        "Cuauhtémoc",
-        "Benito Juárez",
-        "Coyoacán",
-        "Álvaro Obregón",
-    ],
-    "Zona": ["Norte", "Norte", "Norte", "Norte", "Norte",
-             "Norte", "Centro", "Centro", "Sur", "Sur"],
-    "LST °C": [33.5, 34.8, 34.2, 33.0, 33.8, 33.2,
-               31.5, 30.8, 29.2, 28.5],
-    "NDVI": [0.14, 0.11, 0.12, 0.15, 0.13, 0.16,
-             0.20, 0.22, 0.30, 0.28],
-    "NO₂ (×10⁻⁵)": [15.2, 16.8, 15.5, 14.0, 16.2, 15.8,
-                     14.5, 13.2, 9.5, 8.8],
-    "PM₂.₅ µg/m³": [28.5, 29.2, 27.8, 26.5, 27.0, 26.8,
-                     23.5, 21.0, 16.5, 15.8],
-    "IM 2020": [0.85, 1.12, 0.95, 0.78, 0.65, 0.72,
-                0.15, -0.28, -0.35, -0.18],
-    "Tasa Resp.": [10500, 12000, 11500, 10800, 9800, 9500,
-                   7500, 6500, 5500, 5800],
-}
+# Read from the aggregated table that notebook 07 exports, so the numbers shown
+# here are exactly the ones quoted in the README.
+#
+# An earlier version of this section carried hardcoded placeholder values with a
+# comment claiming they came "from the README findings". They did not: they listed
+# 10 municipios instead of 21, the respiratory rates were off by 2-3x, and the zone
+# assignment was the old README one rather than the one in the data.
+_burden = pd.read_csv(
+    ROOT / "dashboards" / "data" / "municipio_completo.csv"
+).sort_values("burden_score", ascending=True)
 
-df_burden = pd.DataFrame(burden_data)
+df_burden = pd.DataFrame({
+    "Municipio": _burden["NOM_MUN"],
+    "Zona": _burden["zona"],
+    "LST °C": _burden["lst_mean"],
+    "NDVI": _burden["ndvi_mean"],
+    "NO₂ (×10⁻⁵)": _burden["no2_mean"] * 1e5,
+    "PM₂.₅ µg/m³": _burden["pm25_mean"],
+    "IMN": _burden["imn_mean"],
+    "Tasa Resp.": _burden["tasa_respiratoria"],
+    "Carga (menor = peor)": _burden["burden_score"],
+}).reset_index(drop=True)
 
 # Color-coded zone column
 def zone_color(val: str) -> str:
     colors = {"Norte": "#E74C3C", "Centro": "#F39C12", "Sur": "#27AE60"}
     return f"background-color: {colors.get(val, '#888')}; color: white; font-weight: 600;"
 
+# Styler.map replaced Styler.applymap in pandas 2.1, and applymap was removed in
+# pandas 3.0 -- which is the version Streamlit Community Cloud installs. The
+# fallback keeps the app working on either.
+_burden_style = df_burden.style
+_zone_styler = getattr(_burden_style, "map", None) or _burden_style.applymap
+
 styled = (
-    df_burden.style
-    .applymap(zone_color, subset=["Zona"])
+    _zone_styler(zone_color, subset=["Zona"])
     .format({
         "LST °C": "{:.1f}",
         "NDVI": "{:.2f}",
         "NO₂ (×10⁻⁵)": "{:.1f}",
         "PM₂.₅ µg/m³": "{:.1f}",
-        "IM 2020": "{:.2f}",
+        "IMN": "{:.3f}",
         "Tasa Resp.": "{:,.0f}",
+        "Carga (menor = peor)": "{:.2f}",
     })
 )
 
-st.dataframe(styled, use_container_width=True, hide_index=True)
+st.dataframe(styled, width="stretch", hide_index=True)
 
 st.markdown(
     """
     <div class="key-finding">
-        <strong>GAM (Gustavo A. Madero) encabeza la carga integrada</strong> — la peor combinación
-        de temperatura, vegetación escasa, NO₂ elevado, PM₂.₅ alto, marginación alta y alta tasa
-        de enfermedades respiratorias.<br><br>
-        Los municipios del <span class="zone-norte">norte</span> dominan consistentemente los peores
-        puestos. Las alcaldías del <span class="zone-sur">sur</span> consistentemente los mejores.
-        El <span class="zone-centro">centro</span> ocupa una posición intermedia, con mejor
-        infraestructura pero contaminación por tráfico.
+        <strong>Cuauhtémoc, Azcapotzalco y Benito Juárez encabezan la carga integrada;</strong>
+        Gustavo A. Madero queda 4º. El ranking está dominado por el
+        <span class="zone-centro">centro</span>, empujado por el NO₂ del tráfico, y no solo por
+        la periferia <span class="zone-norte">norte</span>.<br><br>
+        La narrativa norte–sur es sólida para temperatura y vegetación, pero se rompe al agregar
+        contaminación: el centro también carga de forma severa. Las alcaldías del
+        <span class="zone-sur">sur</span> siguen siendo las mejor posicionadas. La columna
+        "Carga" ordena la tabla: menor valor = mayor carga combinada.
     </div>
     """,
     unsafe_allow_html=True,
