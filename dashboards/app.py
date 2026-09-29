@@ -1,6 +1,6 @@
 """
-Dashboard: Dos Méxicos Under the Same Sun
-Green Inequality, Urban Heat Islands, and Air Quality in Mexico City
+Dashboard: Dos Méxicos Bajo el Mismo Sol
+Desigualdad ambiental en la Ciudad de México.
 
 Run with: streamlit run dashboards/app.py
 """
@@ -9,15 +9,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
+import streamlit as st
 
 # ---------------------------------------------------------------------------
 # Page config
 # ---------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Dos Méxicos Bajo el Mismo Sol",
+    page_title="Dos Méxicos bajo el mismo sol",
     page_icon="🌡️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -28,341 +28,332 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 MAPAS = ROOT / "outputs" / "mapas" / "zmvm"
+GRAFICOS = ROOT / "outputs" / "graficos"
+DATA = ROOT / "dashboards" / "data"
 
 # ---------------------------------------------------------------------------
-# Zone colours
+# Zone colours (kept in sync with scripts/export_maps.py)
 # ---------------------------------------------------------------------------
-COLORS = {
-    "norte": "#E74C3C",
-    "centro": "#F39C12",
-    "sur": "#27AE60",
-}
+COLORS = {"Norte": "#C0392B", "Centro": "#B9770E", "Sur": "#1E8449"}
 
 # ---------------------------------------------------------------------------
-# Custom CSS
+# Style
+#
+# Colours are expressed with opacity and rgba() instead of fixed greys so the
+# page reads correctly on a light or a dark background. The base theme is set in
+# .streamlit/config.toml, and the type scale is deliberately narrow: the hero is
+# 2.1rem against 1rem body text, not 2.6rem against 1rem.
 # ---------------------------------------------------------------------------
-st.markdown("""
+st.markdown(
+    """
 <style>
     .hero-title {
-        font-size: 2.6rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        line-height: 1.1;
-        margin-bottom: 0.5rem;
+        font-size: 2.1rem; font-weight: 800; letter-spacing: -0.02em;
+        line-height: 1.15; margin-bottom: 0.4rem;
     }
     .hero-sub {
-        font-size: 1.1rem;
-        color: #A0A0A0;
-        font-weight: 400;
-        margin-bottom: 2rem;
+        font-size: 1.02rem; opacity: 0.75; margin-bottom: 1.4rem;
+    }
+    .hook {
+        font-size: 1.22rem; line-height: 1.55; font-weight: 500;
+        margin: 0.4rem 0 1.4rem 0;
     }
     .section-header {
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #333;
+        font-size: 1.45rem; font-weight: 700; margin-top: 2.2rem;
+        margin-bottom: 0.9rem; padding-bottom: 0.45rem;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.35);
     }
-    .stat-number {
-        font-size: 2.2rem;
-        font-weight: 800;
-        line-height: 1;
+    .stat-number { font-size: 1.8rem; font-weight: 800; line-height: 1.05; }
+    .stat-label  { font-size: 0.9rem; opacity: 0.7; }
+    .card {
+        padding: 1.05rem 1.2rem; border-radius: 8px; margin: 1rem 0;
+        border-left: 4px solid #C0392B;
+        background: rgba(128, 128, 128, 0.09);
     }
-    .stat-label {
-        font-size: 0.85rem;
-        color: #A0A0A0;
-    }
-    .key-finding {
-        background-color: #1A1A2E;
-        padding: 1.2rem;
-        border-radius: 8px;
-        border-left: 4px solid #E74C3C;
-        margin: 1rem 0;
-    }
-    .zone-norte { color: #E74C3C; font-weight: 600; }
-    .zone-centro { color: #F39C12; font-weight: 600; }
-    .zone-sur { color: #27AE60; font-weight: 600; }
+    .card.good { border-left-color: #1E8449; }
+    .card.null { border-left-color: #7F8C8D; }
+    .zone-norte  { color: #C0392B; font-weight: 600; }
+    .zone-centro { color: #B9770E; font-weight: 600; }
+    .zone-sur    { color: #1E8449; font-weight: 600; }
     .citation {
-        font-size: 0.8rem;
-        color: #666;
-        text-align: center;
-        margin-top: 3rem;
-        padding-top: 2rem;
-        border-top: 1px solid #333;
+        font-size: 0.85rem; opacity: 0.6; text-align: center;
+        margin-top: 3rem; padding-top: 1.5rem;
+        border-top: 1px solid rgba(128, 128, 128, 0.3);
     }
     @media (max-width: 768px) {
-        .hero-title { font-size: 1.8rem; }
+        .hero-title { font-size: 1.6rem; }
+        .hook { font-size: 1.08rem; }
+        .section-header { font-size: 1.22rem; }
+        .stat-number { font-size: 1.45rem; }
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # ===========================================================================
 # HERO
 # ===========================================================================
+st.markdown('<div class="hero-title">Dos Méxicos bajo el mismo sol</div>', unsafe_allow_html=True)
 st.markdown(
-    f'<div class="hero-title">☀️ Dos Méxicos<br>Bajo el Mismo Sol</div>',
-    unsafe_allow_html=True,
-)
-st.markdown(
-    '<div class="hero-sub">'
-    "Green Inequality, Urban Heat Islands, and Air Quality in Mexico City"
+    '<div class="hero-sub">Desigualdad ambiental en la Zona Metropolitana del Valle de '
+    "México, medida con datos satelitales, monitoreo de aire, censo y registros de salud."
     "</div>",
     unsafe_allow_html=True,
 )
+st.markdown(
+    '<div class="hook">En la misma ciudad, unos viven a 40 °C y otros a 22 °C. '
+    "Eso no lo decide el clima: lo decide cuánto concreto y cuánta vegetación tiene "
+    "tu colonia.</div>",
+    unsafe_allow_html=True,
+)
 
-# Quick stats row
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.markdown('<div class="stat-number">5–10 °C</div>', unsafe_allow_html=True)
-    st.markdown('<div class="stat-label">Norte-sur gap en temperatura</div>', unsafe_allow_html=True)
-with col2:
-    st.markdown('<div class="stat-number">~2000</div>', unsafe_allow_html=True)
-    st.markdown('<div class="stat-label">Productos analizados</div>', unsafe_allow_html=True)
-with col3:
-    st.markdown('<div class="stat-number">20</div>', unsafe_allow_html=True)
-    st.markdown('<div class="stat-label">Municipios en zona de estudio</div>', unsafe_allow_html=True)
-with col4:
-    st.markdown('<div class="stat-number">6</div>', unsafe_allow_html=True)
-    st.markdown('<div class="stat-label">Indicadores integrados</div>', unsafe_allow_html=True)
+_c1, _c2, _c3, _c4 = st.columns(4)
+for col, number, label in [
+    (_c1, "9.2 °C", "de brecha de temperatura entre el norte y el sur"),
+    (_c2, "+66 %", "más vegetación (NDVI) en el sur que en el norte"),
+    (_c3, "21", "municipios y 3,419 AGEBs analizados"),
+    (_c4, "34", "respuestas ciudadanas — la encuesta sigue abierta"),
+]:
+    with col:
+        st.markdown(f'<div class="stat-number">{number}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="stat-label">{label}</div>', unsafe_allow_html=True)
 
 st.divider()
 
 # ===========================================================================
-# SECTION 1 — THE PROBLEM
+# 1 — EL CONTRASTE
 # ===========================================================================
-st.markdown('<div class="section-header">🔬 El Problema</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header">1. El contraste</div>', unsafe_allow_html=True)
 
-left, right = st.columns([1.2, 1])
+left, right = st.columns([1.15, 1])
 
 with left:
     st.markdown(
         """
-        La Zona Metropolitana del Valle de México (ZMVM) es una de las áreas urbanas más grandes del
-        mundo — 22 millones de personas en 76 municipios. Pero la ciudad no es uniforme.
-        
-        Algunas colonias tienen calles arboladas, parques y aire fresco. Otras tienen concreto,
-        asfalto y humo de escape.
-        
-        **¿La brecha ambiental en la CDMX se puede medir desde el espacio?**
-        
-        Este proyecto responde esa pregunta con datos satelitales de la NASA (Landsat 8/9) y la
-        ESA (Sentinel-5P), combinados con datos censales de INEGI, monitoreo de calidad del
-        aire (SINAICA) y registros de salud pública (DGIS).
+        La ZMVM alberga a unas 22 millones de personas en 76 municipios. Pero no es una sola
+        ciudad: es una donde el ambiente cambia según dónde te tocó vivir.
+
+        Medimos la temperatura de la superficie con imágenes térmicas de los satélites Landsat
+        8 y 9. La diferencia entre la zona norte y la zona sur es de **9.2 °C en promedio**, y
+        de **17.7 °C entre el municipio más caliente y el más frío**.
+
+        La vegetación sigue el mismo patrón: el sur tiene **66 % más** índice verde que el norte.
+
+        **Este contraste ambiental es el hallazgo más sólido del proyecto**, y se sostiene con
+        cinco mediciones independientes que no dependen una de otra.
         """
     )
 
 with right:
-    st.image(
-        str(MAPAS / "no2_zmvm.png"),
-        caption="NO₂ troposférico en la ZMVM — Sentinel-5P TROPOMI (ESA). Las zonas rojas son las más contaminadas.",
-        width="stretch",
-    )
-
-st.divider()
-
-# ===========================================================================
-# SECTION 2 — TEMPERATURE & VEGETATION
-# ===========================================================================
-st.markdown('<div class="section-header">🌡️ Temperatura y Vegetación</div>', unsafe_allow_html=True)
-
-st.markdown(
-    """
-    El norte de la ZMVM es **5–10 °C más caliente** que el sur, tanto en verano como en invierno.
-    No es un fenómeno meteorológico puntual — es estructural.
-    """
-)
-
-col_lst, col_ndvi = st.columns(2)
-
-with col_lst:
-    st.image(
-        str(MAPAS / "lst_chart_zmvm.png"),
-        caption="Temperatura superficial (Landsat 8/9). El norte promedia ~35 °C, el sur ~27 °C.",
-        width="stretch",
-    )
-
-with col_ndvi:
-    st.image(
-        str(MAPAS / "ndvi_chart_zmvm.png"),
-        caption="Índice de vegetación NDVI. El norte tiene menos de la mitad de vegetación que el sur.",
-        width="stretch",
-    )
-
-st.markdown(
-    """
-    <div class="key-finding">
-        <strong>Correlación LST–NDVI: r = −0.936 a nivel municipio (n = 21)</strong><br>
-        En el cinturón de concreto, medido por muestreo de 400 píxeles en el notebook 02,
-        la correlación reportada es r = −0.829 — pendiente de reproducir (ver Limitaciones).
-        Donde no hay árboles, el calor se queda.
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.divider()
-
-# ===========================================================================
-# SECTION 3 — AIR POLLUTION
-# ===========================================================================
-st.markdown('<div class="section-header">💨 Contaminación Atmosférica</div>', unsafe_allow_html=True)
-
-st.markdown(
-    """
-    La misma geografía que es más caliente y tiene menos vegetación también respira aire más contaminado.
-    Combinamos datos satelitales (NO₂ troposférico) con datos de 13 estaciones de monitoreo en tierra.
-    """
-)
-
-col_no2, col_pm = st.columns(2)
-
-with col_no2:
-    st.image(
-        str(MAPAS / "no2_chart_zmvm.png"),
-        caption="NO₂ satelital (Sentinel-5P). El norte tiene 30–50% más NO₂ que el sur.",
-        width="stretch",
-    )
-
-with col_pm:
-    st.image(
-        str(MAPAS / "pm_chart_zmvm.png"),
-        caption="Material particulado (PM₂.₅ y PM₁₀) en estaciones SINAICA.",
-        width="stretch",
-    )
-
-st.markdown(
-    """
-    <div class="key-finding">
-        <strong>TODAS las estaciones de monitoreo EXCEDEN los límites anuales de la OMS</strong><br>
-        • PM₂.₅: norte 27.5 µg/m³, sur 14.4 µg/m³ — límite OMS: 5 µg/m³<br>
-        • PM₁₀: norte 54.3 µg/m³, sur 32.8 µg/m³ — límite OMS: 15 µg/m³
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.divider()
-
-# ===========================================================================
-# SECTION 4 — SOCIAL DIMENSION + HEALTH
-# ===========================================================================
-st.markdown('<div class="section-header">🧭 Dimensión Social y Salud</div>', unsafe_allow_html=True)
-
-st.markdown(
-    """
-    La marginación socioeconómica no está distribuida uniformemente — y se correlaciona casi
-    perfectamente con la división ambiental.
-    """
-)
-
-left, right = st.columns(2)
-
-with left:
     st.image(
         str(MAPAS / "marginacion_zmvm.png"),
-        caption="Índice de Marginación (CONAPO) por municipio. Las zonas más calientes son las más marginadas.",
+        caption="Índice de Marginación (CONAPO 2020) por municipio. La marginación media es casi "
+        "idéntica en las tres zonas (0.950 / 0.958 / 0.953) — ver sección 4.",
         width="stretch",
-    )
-
-with right:
-    st.markdown(
-        """
-        ### Hallazgos clave
-        
-        - **IM_2020 y LST: r = +0.30, no significativo con n = 21 municipios.** La dirección
-          acompaña la hipótesis, pero la muestra municipal no alcanza para sostenerla.
-        
-        - **La gradiente marginación–salud respiratoria NO es monotónica.** Las medianas por
-          grado de marginación son 17,266 (Muy bajo), 14,153 (Bajo), 16,066 (Medio) y 21,961
-          (Alto) por 100 mil habitantes. Solo el grado "Alto" se despega del resto.
-        
-        - **El área verde no muestra un efecto protector con esta métrica.** La correlación con
-          la tasa respiratoria es *positiva* (r = +0.52) porque la métrica suma todo el
-          inventario de áreas verdes, camellones e instalaciones incluidos.
-        
-        - **Correlación marginación–tasa respiratoria: r = −0.06 a nivel AGEB (n = 3,419).**
-          Prácticamente nula. La desigualdad ambiental está bien medida; su vínculo con la
-          salud respiratoria, no.
-        """
     )
 
 st.divider()
 
 # ===========================================================================
-# SECTION 5 — INTEGRATED BURDEN HEATMAP
+# 2 — TEMPERATURA Y VEGETACIÓN
 # ===========================================================================
-st.markdown('<div class="section-header">🔥 Carga Integrada — El Mapa Completo</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header">2. Temperatura y vegetación</div>', unsafe_allow_html=True)
 
 st.markdown(
     """
-    Combinamos los 6 indicadores (LST, NDVI, NO₂, PM₂.₅, marginación, salud respiratoria)
-    en un ranking integrado por municipio. El resultado muestra quién carga con el peso
-    más pesado de la desigualdad ambiental.
+    La brecha térmica aparece tanto en verano como en invierno, así que no es un fenómeno
+    meteorológico puntual: es estructural, y está determinada por el tipo de superficie.
     """
 )
 
-# --- INTEGRATED BURDEN TABLE ---
-# Read from the aggregated table that notebook 07 exports, so the numbers shown
-# here are exactly the ones quoted in the README.
-#
-# An earlier version of this section carried hardcoded placeholder values with a
-# comment claiming they came "from the README findings". They did not: they listed
-# 10 municipios instead of 21, the respiratory rates were off by 2-3x, and the zone
-# assignment was the old README one rather than the one in the data.
-_burden = pd.read_csv(
-    ROOT / "dashboards" / "data" / "municipio_completo.csv"
-).sort_values("burden_score", ascending=True)
+st.image(
+    str(MAPAS / "lst_chart_zmvm.png"),
+    caption="Temperatura superficial media por zona (Landsat 8/9). Norte 35.9 °C, "
+    "Centro 36.1 °C, Sur 26.7 °C.",
+    width="stretch",
+)
 
-df_burden = pd.DataFrame({
-    "Municipio": _burden["NOM_MUN"],
-    "Zona": _burden["zona"],
-    "LST °C": _burden["lst_mean"],
-    "NDVI": _burden["ndvi_mean"],
-    "NO₂ (×10⁻⁵)": _burden["no2_mean"] * 1e5,
-    "PM₂.₅ µg/m³": _burden["pm25_mean"],
-    "IMN": _burden["imn_mean"],
-    "Tasa Resp.": _burden["tasa_respiratoria"],
-    "Carga (menor = peor)": _burden["burden_score"],
-}).reset_index(drop=True)
+st.image(
+    str(MAPAS / "ndvi_chart_zmvm.png"),
+    caption="Índice de vegetación NDVI por zona. Norte 0.144, Centro 0.115, Sur 0.239.",
+    width="stretch",
+)
 
-# Color-coded zone column
-def zone_color(val: str) -> str:
-    colors = {"Norte": "#E74C3C", "Centro": "#F39C12", "Sur": "#27AE60"}
-    return f"background-color: {colors.get(val, '#888')}; color: white; font-weight: 600;"
+st.markdown(
+    """
+    <div class="card good">
+        <strong>LST–NDVI: r = −0.936 a nivel municipio (n = 21)</strong><br>
+        Donde no hay árboles, el calor se queda. En el cinturón de concreto, el muestreo de
+        400 píxeles del notebook 02 da r = −0.829 — ese valor todavía no es reproducible desde
+        los archivos publicados, y así está declarado.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.divider()
+
+# ===========================================================================
+# 3 — CONTAMINACIÓN
+# ===========================================================================
+st.markdown('<div class="section-header">3. Contaminación atmosférica</div>', unsafe_allow_html=True)
+
+st.markdown(
+    """
+    La contaminación no sigue una línea norte–sur simple. El **NO₂ más alto está en el centro**
+    (22.4 ×10⁻⁵ mol/m²), no en el norte (18.3), porque el centro concentra el tráfico. Ese
+    detalle importa: rompe la lectura fácil de "periferia mala, centro bueno".
+    """
+)
+
+st.image(
+    str(MAPAS / "no2_chart_zmvm.png"),
+    caption="NO₂ troposférico por zona (Sentinel-5P TROPOMI). Centro 22.4, Norte 18.3, Sur 13.1.",
+    width="stretch",
+)
+
+st.image(
+    str(MAPAS / "pm_chart_zmvm.png"),
+    caption="Material particulado PM₂.₅ en estaciones SINAICA. Las diferencias entre zonas son "
+    "modestas: Norte 18.9, Centro 17.9, Sur 16.9 µg/m³.",
+    width="stretch",
+)
+
+st.image(
+    str(MAPAS / "no2_zmvm.png"),
+    caption="Distribución espacial del NO₂ troposférico en la ZMVM (Sentinel-5P).",
+    width="stretch",
+)
+
+st.markdown(
+    """
+    <div class="card good">
+        <strong>Las estaciones de monitoreo superan los límites anuales de la OMS</strong><br>
+        Ninguna zona de la ciudad respira aire dentro de la guía anual de PM₂.₅ (5 µg/m³). La
+        diferencia entre zonas existe, pero es mucho menor que la brecha de temperatura.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.divider()
+
+# ===========================================================================
+# 4 — LO QUE NO SE SOSTIENE
+# ===========================================================================
+st.markdown('<div class="section-header">4. Lo que no se sostiene</div>', unsafe_allow_html=True)
+
+st.markdown(
+    """
+    Hasta acá, todo confirma la hipótesis. **Pero el proyecto se propuso algo más ambicioso**:
+    probar que la desigualdad ambiental y la desigualdad social son la misma cosa, y que eso se
+    traduce en salud. Y ahí no llegamos.
+    """
+)
+
+st.markdown(
+    """
+    <div class="card null">
+        <strong>La marginación es casi idéntica en las tres zonas.</strong><br>
+        Índice medio normalizado: <span class="zone-norte">Norte 0.953</span> ·
+        <span class="zone-centro">Centro 0.958</span> ·
+        <span class="zone-sur">Sur 0.950</span>. Las tres zonas se construyeron como grupos
+        balanceados de 7 municipios, no como un gradiente social. Eso explica por qué las
+        correlaciones con marginación salen débiles o nulas: <em>no había contraste que medir</em>.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
+    <div class="card null">
+        <strong>Marginación y salud respiratoria: r = −0.06 (n = 3,419 AGEBs).</strong><br>
+        Prácticamente nula, y con el signo opuesto al esperado. A nivel municipal es −0.29, y
+        tampoco es significativa. <strong>La tasa respiratoria sí difiere entre zonas
+        (Norte 12,736 · Centro 12,615 · Sur 7,737 por 100 mil), pero sigue al gradiente
+        ambiental, no al social.</strong>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
+    <div class="card null">
+        <strong>La métrica de área verde no mide lo que su nombre sugiere.</strong><br>
+        Suma los 11,739 polígonos del inventario de la SEDEMA sin filtrar por categoría. De los
+        67.3 km² sumados, solo <strong>29.2 % es espacio recreativo</strong>: 42.3 % es
+        vegetación dentro de instalaciones y 14.2 % son camellones de avenidas. Un camellón
+        cuenta igual que un parque, y por eso la correlación con salud sale <em>positiva</em>.
+        Arreglar esto es el siguiente paso, y puede cambiar el signo.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
+    ##### Ranking de carga integrada
+
+    Promedio de los seis indicadores ordenado por severidad. La columna "Carga" ordena la
+    tabla: **menor valor = mayor carga combinada**. Los datos se leen del archivo que exporta
+    el notebook 07, no de valores escritos a mano.
+    """
+)
+
+
+def _zone_color(val: str) -> str:
+    return f"background-color: {COLORS.get(val, '#888888')}; color: white; font-weight: 600;"
+
+
+_burden = pd.read_csv(DATA / "municipio_completo.csv").sort_values(
+    "burden_score", ascending=True
+)
+
+df_burden = pd.DataFrame(
+    {
+        "Municipio": _burden["NOM_MUN"],
+        "Zona": _burden["zona"],
+        "LST °C": _burden["lst_mean"],
+        "NDVI": _burden["ndvi_mean"],
+        "NO₂ (×10⁻⁵)": _burden["no2_mean"] * 1e5,
+        "PM₂.₅ µg/m³": _burden["pm25_mean"],
+        "IMN": _burden["imn_mean"],
+        "Tasa resp.": _burden["tasa_respiratoria"],
+        "Carga (menor = peor)": _burden["burden_score"],
+    }
+).reset_index(drop=True)
 
 # Styler.map replaced Styler.applymap in pandas 2.1, and applymap was removed in
-# pandas 3.0 -- which is the version Streamlit Community Cloud installs. The
-# fallback keeps the app working on either.
+# pandas 3.0 -- which is the version Streamlit Community Cloud installs.
 _burden_style = df_burden.style
 _zone_styler = getattr(_burden_style, "map", None) or _burden_style.applymap
 
-styled = (
-    _zone_styler(zone_color, subset=["Zona"])
-    .format({
-        "LST °C": "{:.1f}",
-        "NDVI": "{:.2f}",
-        "NO₂ (×10⁻⁵)": "{:.1f}",
-        "PM₂.₅ µg/m³": "{:.1f}",
-        "IMN": "{:.3f}",
-        "Tasa Resp.": "{:,.0f}",
-        "Carga (menor = peor)": "{:.2f}",
-    })
+st.dataframe(
+    _zone_styler(_zone_color, subset=["Zona"]).format(
+        {
+            "LST °C": "{:.1f}",
+            "NDVI": "{:.3f}",
+            "NO₂ (×10⁻⁵)": "{:.1f}",
+            "PM₂.₅ µg/m³": "{:.1f}",
+            "IMN": "{:.3f}",
+            "Tasa resp.": "{:,.0f}",
+            "Carga (menor = peor)": "{:.2f}",
+        }
+    ),
+    width="stretch",
+    hide_index=True,
 )
-
-st.dataframe(styled, width="stretch", hide_index=True)
 
 st.markdown(
     """
-    <div class="key-finding">
+    <div class="card">
         <strong>Cuauhtémoc, Azcapotzalco y Benito Juárez encabezan la carga integrada;</strong>
         Gustavo A. Madero queda 4º. El ranking está dominado por el
         <span class="zone-centro">centro</span>, empujado por el NO₂ del tráfico, y no solo por
-        la periferia <span class="zone-norte">norte</span>.<br><br>
-        La narrativa norte–sur es sólida para temperatura y vegetación, pero se rompe al agregar
-        contaminación: el centro también carga de forma severa. Las alcaldías del
-        <span class="zone-sur">sur</span> siguen siendo las mejor posicionadas. La columna
-        "Carga" ordena la tabla: menor valor = mayor carga combinada.
+        la periferia <span class="zone-norte">norte</span>.
     </div>
     """,
     unsafe_allow_html=True,
@@ -371,92 +362,171 @@ st.markdown(
 st.divider()
 
 # ===========================================================================
-# SECTION 6 — SURVEY (preliminary)
+# 5 — CÓMO LO MEDIMOS
 # ===========================================================================
-st.markdown('<div class="section-header">📋 Encuesta Ciudadana — Avance</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header">5. Cómo lo medimos</div>', unsafe_allow_html=True)
+
+col_a, col_b = st.columns(2)
+
+with col_a:
+    st.markdown(
+        """
+        **Fuentes**
+
+        | Capa | Fuente | Período |
+        |---|---|---|
+        | Temperatura superficial | Landsat 8/9 (NASA) | 2025–2026 |
+        | Vegetación (NDVI) | Landsat 8/9 | 2025–2026 |
+        | NO₂ troposférico | Sentinel-5P TROPOMI (ESA) | 2025–2026 |
+        | PM₂.₅ / PM₁₀ | 13 estaciones SINAICA (INECC) | 2023 y 2025 |
+        | Egresos respiratorios | DGIS (Secretaría de Salud), J00–J99 | 2023 |
+        | Marginación | CONAPO, índice 2020 por AGEB | 2020 |
+        | Áreas verdes | Inventario SEDEMA | — |
+        """
+    )
+
+with col_b:
+    st.markdown(
+        """
+        **Dos niveles de análisis, y no son intercambiables**
+
+        - **AGEB** (n = 3,419): la unidad más fina. Es donde se miden marginación y salud.
+        - **Municipio** (n = 21): donde se integran los seis indicadores.
+
+        Una correlación calculada en un nivel **no describe** el otro, y puede cambiar de
+        signo entre ambos. Cada resultado de esta página indica su nivel y su n.
+
+        **Las capas no son contemporáneas.** El diseño cruza variables de 2020 a 2026, lo que
+        asume que el patrón espacial de cada una es estable. Es defendible para el suelo y la
+        vegetación, que cambian lento; es más frágil para el NO₂, cuyo patrón se movió con el
+        tráfico después de la pandemia.
+        """
+    )
+
+st.divider()
+
+# ===========================================================================
+# 6 — LÍMITES
+# ===========================================================================
+st.markdown('<div class="section-header">6. Límites</div>', unsafe_allow_html=True)
 
 st.markdown(
     """
-    Los satélites nos dan datos, pero lo que no registran es cómo se vive esta desigualdad
-    en el día a día. Por eso lanzamos una encuesta ciudadana anónima sobre percepción
-    ambiental y salud en la ZMVM.
-    """
-)
+    Un resultado sin sus límites no es un resultado. Estos son los que más acotan lo anterior.
 
-col_survey1, col_survey2, col_survey3 = st.columns(3)
-with col_survey1:
-    st.markdown('<div class="stat-number">33</div>', unsafe_allow_html=True)
-    st.markdown('<div class="stat-label">Respuestas hasta ahora</div>', unsafe_allow_html=True)
-with col_survey2:
-    st.markdown('<div class="stat-number">18</div>', unsafe_allow_html=True)
-    st.markdown('<div class="stat-label">Preguntas</div>', unsafe_allow_html=True)
-with col_survey3:
-    st.markdown('<div class="stat-number">~5 min</div>', unsafe_allow_html=True)
-    st.markdown('<div class="stat-label">Tiempo estimado</div>', unsafe_allow_html=True)
-
-st.markdown(
+    1. **La marginación no varía entre zonas** (0.950 / 0.958 / 0.953). Las zonas son grupos
+       balanceados de 7 municipios, no un gradiente social. Cualquier conclusión sobre
+       marginación y ambiente está limitada por esto.
+    2. **La muestra municipal es chica.** Con n = 21 y 7 variables, solo 7 de los 21 pares
+       tienen una correlación distinguible de cero.
+    3. **La métrica de área verde suma camellones e instalaciones.** Ver sección 4.
+    4. **Riesgo de falacia ecológica.** Una asociación por AGEB o por municipio no describe a
+       las personas.
+    5. **El nivel de la tasa respiratoria no está verificado.** La tasa ponderada por población
+       es de 15,887 por 100 mil (15.9 %), demasiado alta para egresos hospitalarios en un año.
+       J00–J99 incluye el resfrío común, así que la fuente puede estar contando consultas.
+       Las correlaciones no dependen de que el nivel sea correcto; las cifras de nivel, sí.
+    6. **La encuesta es un piloto.** 34 respuestas en 16 municipios, mediana de 2 por municipio.
+       No es representativa y ningún resultado cuantitativo de esta página se apoya en ella.
     """
-    <div style="background-color: #1A1A2E; padding: 1.5rem; border-radius: 8px; margin-top: 1rem;">
-        <strong>🏁 Meta: 100 respuestas</strong><br>
-        Necesitamos más voces del norte de la ciudad (Ecatepec, GAM, Neza, Tlalnepantla, Naucalpan, Iztapalapa)
-        para equilibrar la muestra. Los resultados se publicarán abiertamente para fortalecer
-        la exigencia de justicia ambiental en la ZMVM.
-    </div>
-    """,
-    unsafe_allow_html=True,
 )
 
 st.divider()
 
 # ===========================================================================
-# FOOTER
+# 7 — QUÉ SIGUE
 # ===========================================================================
+st.markdown('<div class="section-header">7. Qué sigue</div>', unsafe_allow_html=True)
+
 st.markdown(
-    '<div class="section-header">📖 Sobre el Proyecto</div>',
+    """
+    Los satélites miden el ambiente. Lo que no registran es **cómo se vive esa desigualdad**:
+    cuánto tiempo pasas en el transporte, si notás el cambio de vegetación al cruzar la ciudad,
+    si usás los parques que tenés cerca.
+
+    Para eso hay una encuesta ciudadana abierta. Es la única fuente posible: no existe un
+    registro público de uso del espacio público a escala de colonia.
+    """
+)
+
+_c1, _c2, _c3 = st.columns(3)
+for col, number, label in [
+    (_c1, "34", "respuestas hasta ahora"),
+    (_c2, "18", "preguntas, 5 minutos"),
+    (_c3, "400", "meta para poder comparar por zona"),
+]:
+    with col:
+        st.markdown(f'<div class="stat-number">{number}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="stat-label">{label}</div>', unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <div class="card">
+        <strong>Faltan voces del norte y del oriente de la ciudad</strong><br>
+        Con 2 respuestas por municipio no se puede comparar zonas, y esa comparación es
+        justamente el objetivo. Los resultados se publicarán abiertos.
+    </div>
+    """,
     unsafe_allow_html=True,
 )
+
+st.markdown(
+    """
+    **El siguiente arreglo técnico** es reconstruir la métrica de área verde usando solo las
+    categorías recreativas (parques, plazas, jardines) y sumar una medida de accesibilidad:
+    la distancia de cada AGEB al parque más cercano. Hoy tenemos 11,739 polígonos con
+    categoría y geometría en el repositorio, y la métrica actual los suma todos.
+    """
+)
+
+st.divider()
+
+# ===========================================================================
+# 8 — SOBRE EL PROYECTO
+# ===========================================================================
+st.markdown('<div class="section-header">8. Sobre el proyecto</div>', unsafe_allow_html=True)
 
 col_about1, col_about2 = st.columns(2)
 
 with col_about1:
     st.markdown(
         """
-        **Datos y métodos**
-        
-        - **Temperatura superficial:** Landsat 8/9 (NASA), bandas térmicas, verano 2023
-        - **Vegetación:** NDVI desde Landsat 8/9
-        - **NO₂ troposférico:** Sentinel-5P TROPOMI (ESA), anual 2023
-        - **Material particulado:** 13 estaciones SINAICA (INECC), promedio anual
-        - **Marginación:** CONAPO, Índice de Marginación 2020 por AGEB
-        - **Salud:** DGIS, egresos hospitalarios por enfermedades respiratorias (J00–J99)
+        **Stack**
+
+        | Herramienta | Uso |
+        |---|---|
+        | Python 3.10+ | Lenguaje principal |
+        | Google Earth Engine | Procesamiento satelital |
+        | geopandas / shapely | Análisis espacial vectorial |
+        | scipy / statsmodels / scikit-learn | Estadística, regresiones, clústeres |
+        | matplotlib | Visualización estática |
+        | Streamlit | Este informe |
+
+        Este dashboard **no es interactivo**: renderiza figuras ya calculadas por el notebook
+        07. Los datos agregados están en el repositorio para que cualquiera pueda recomputar
+        cada número citado acá.
         """
     )
 
 with col_about2:
     st.markdown(
         """
-        **Stack tecnológico**
-        
-        | Herramienta | Uso |
-        |---|---|
-        | Python 3.10+ | Lenguaje principal |
-        | Google Earth Engine | Procesamiento satelital |
-        | geopandas / shapely | Análisis espacial vectorial |
-        | matplotlib | Visualización estática |
-        | Streamlit | Dashboard interactivo |
-        
-        ---
-        
-        **Autora:** Nelly Itzel Rodríguez Ortiz  
-        Ingeniera en Computación, MSc. Microelectrónica  
+        **Autora**
+
+        Nelly Itzel Rodríguez Ortiz
+        Ingeniera en Computación · MSc. en Microelectrónica
         Procesamiento de señales e información aplicado a datos ambientales
+
+        ---
+
+        **Trabajo abierto.** El análisis completo, las limitaciones y las fuentes están en el
+        repositorio. Si encontrás un error, es un aporte.
         """
     )
 
 st.markdown(
     '<div class="citation">'
-    "Proyecto de código abierto — "
-    '<a href="https://github.com/nellsdev">github.com/nellsdev</a>'
+    'Proyecto de código abierto — <a href="https://github.com/nellsdev">github.com/nellsdev</a>'
     "</div>",
     unsafe_allow_html=True,
 )
