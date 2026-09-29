@@ -74,7 +74,9 @@ ZONA_INCIDENCIA = frozenset({"Ecatepec de Morelos", "Gustavo A. Madero", "Nezahu
 INC_EC = "#FFD700"
 INC_LW = 3.0
 
-COLORS = {"norte": "#E63946", "centro": "#F4A261", "sur": "#2A9D8F", "periferia": "#8B8B8B"}
+# Shared with dashboards/app.py. The earlier palette (#E63946 / #F4A261 / #2A9D8F)
+# was too light to carry white text on top of the fills.
+COLORS = {"norte": "#C0392B", "centro": "#B9770E", "sur": "#1E8449", "periferia": "#8B8B8B"}
 ZONE_LABELS = {"norte": "Norte (nororiente)", "centro": "Centro (CDMX)", "sur": "Sur (referencia)", "periferia": "Periferia (EdoMex)"}
 INC_LABELS = {**ZONE_LABELS, "norte": "Incidencia"}
 
@@ -262,7 +264,7 @@ def _style_map_ax(ax, title):
 
 
 def _add_anno(ax, text, x, y, color):
-    ax.text(x, y, text, transform=ax.transAxes, fontsize=8,
+    ax.text(x, y, text, transform=ax.transAxes, fontsize=10,
             fontweight="bold", color=color, ha="center", va="center",
             bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
                       edgecolor=color, linewidth=1.5))
@@ -287,7 +289,7 @@ def _save(fig, name):
 
 
 def _credit(fig, text=None):
-    fig.text(0.5, 0.008, text or CREDIT, ha="center", va="bottom", fontsize=7, color="#666666")
+    fig.text(0.5, 0.008, text or CREDIT, ha="center", va="bottom", fontsize=9, color="#666666")
 
 
 # ---------------------------------------------------------------------------
@@ -349,10 +351,11 @@ def plot_ndvi(mun_gdf, state_bg, sub_region="zmvm"):
     }.items():
         if zone in present:
             _add_anno(ax, text, x, y, COLORS[zone])
-    ax.text(0.05, 0.05,
-            "Correlación LST–NDVI: r = –0.829\nA más vegetación, menor temperatura",
+    ax.text(0.03, 0.04,
+            "LST–NDVI a nivel municipio: r = –0.936 (n = 21)\n"
+            "A más vegetación, menor temperatura",
             transform=ax.transAxes, ha="left", va="bottom",
-            fontsize=7.5, color="#555555",
+            fontsize=9, color="#555555",
             bbox=dict(boxstyle="round,pad=0.3", facecolor="#f8f8f8",
                       edgecolor="#dddddd", linewidth=0.5))
     _style_map_ax(ax, f"Índice de Vegetación (NDVI) — Verano 2025 — {REGION_TITLES[sub_region]}")
@@ -441,7 +444,7 @@ def plot_marginacion(mun_gdf, state_bg, sub_region="zmvm"):
     if sub_region == "edomex":
         _zoom_edomex(ax)
         inc_patch = Patch(facecolor="#fffbe6", edgecolor=INC_EC, linewidth=2, label="Zona de incidencia")
-        ax.legend(handles=[inc_patch], fontsize=7, loc="upper right", framealpha=0.9)
+        ax.legend(handles=[inc_patch], fontsize=9, loc="upper right", framealpha=0.9)
     _style_map_ax(ax, f"Marginación (CONAPO IM_2020)\nPromedio por Municipio — {REGION_TITLES[sub_region]}")
     _credit(fig, "Fuente: CONAPO (Índice de Marginación 2020)")
     _save(fig, f"marginacion_{REGION_FILES[sub_region]}.png")
@@ -484,10 +487,22 @@ def plot_areas_verdes(mun_gdf, state_bg, sub_region="zmvm"):
 # Bar/column charts (kept from original version for data comparison)
 # ---------------------------------------------------------------------------
 
-CHART_COLORS = {"norte": "#E63946", "centro": "#F4A261", "sur": "#2A9D8F"}
+CHART_COLORS = {"norte": "#C0392B", "centro": "#B9770E", "sur": "#1E8449"}
 CHART_LABELS = {"norte": "Norte", "centro": "Centro", "sur": "Sur"}
-CHART_FIG_SIZE = (7.2, 7.2)
+# Wide rather than square. A three-bar chart in a 1:1 canvas spends most of the
+# area on margin, and the dashboard then renders it at under half its native
+# width, shrinking the text baked into the PNG by the same factor.
+CHART_FIG_SIZE = (7.8, 4.0)
 CHART_CREDIT = "Fuente: Landsat 8-9 / Sentinel-5P / SINAICA / CONAPO"
+
+
+# Station -> zone comes from src/stations.py, which declares itself the single
+# source of truth for station metadata. The three chart functions below used to
+# each carry their own copy that listed only 13 of the 20 stations, so any
+# station outside it mapped to NaN and the charts died with "KeyError: nan".
+from src.stations import STATIONS_META  # noqa: E402
+
+ST_META = {name: meta["zone"] for name, meta in STATIONS_META.items()}
 
 
 def _chart_legend():
@@ -499,63 +514,80 @@ def _chart_legend():
 
 
 def _chart_style(ax, title, ylabel=""):
-    ax.set_title(title, fontsize=13, fontweight="bold", color=TITLE_COLOR, pad=12)
-    ax.set_ylabel(ylabel, fontsize=9, color="#444444")
-    ax.tick_params(axis="x", labelsize=8)
-    ax.tick_params(axis="y", labelsize=8)
+    ax.set_title(title, fontsize=15, fontweight="bold", color=TITLE_COLOR, pad=12)
+    ax.set_ylabel(ylabel, fontsize=11, color="#444444")
+    ax.tick_params(axis="x", labelsize=10)
+    ax.tick_params(axis="y", labelsize=10)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
 
-def plot_lst_chart():
-    zones = ["Norte\n(nororiente)", "Centro", "Sur\n(referencia)"]
-    values = [37.5, 34.0, 28.5]
-    colors = [CHART_COLORS["norte"], CHART_COLORS["centro"], CHART_COLORS["sur"]]
-    err = [2.5, 2.0, 2.0]
+ZONE_KEYS = ["norte", "centro", "sur"]
+# Single-line labels: the credit line at the bottom of the figure collided
+# with the wrapped "Norte (nororiente)" tick label.
+ZONE_TITLES = ["Norte", "Centro", "Sur"]
+
+
+def _zone_means(column):
+    """Per-zone mean and sample std, from the table notebook 07 exports.
+
+    These two charts used to carry hardcoded lists. The NDVI one showed a clean
+    north-south gradient (0.12 / 0.20 / 0.33) that the data does not contain:
+    the centre is the LEAST green zone (0.115), below the north (0.144).
+    """
+    df = pd.read_csv(PROJ / "dashboards" / "data" / "municipio_completo.csv")
+    grouped = df.groupby("zona")[column]
+    order = ["Norte", "Centro", "Sur"]
+    return grouped.mean().reindex(order), grouped.std().reindex(order)
+
+
+def _plot_zone_bars(column, title, ylabel, label_fmt, label_pad):
+    means, stds = _zone_means(column)
+    values = means.tolist()
+    err = stds.tolist()
+    colors = [CHART_COLORS[k] for k in ZONE_KEYS]
 
     fig, ax = plt.subplots(figsize=CHART_FIG_SIZE)
-    bars = ax.bar(zones, values, color=colors, width=0.55,
+    bars = ax.bar(ZONE_TITLES, values, color=colors, width=0.5,
                   yerr=err, capsize=6, edgecolor="white", linewidth=1.2)
-    for bar, v in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1.2,
-                f"{v:.0f}°C", ha="center", fontsize=11, fontweight="bold", color=TITLE_COLOR)
-    _chart_style(ax, "Temperatura superficial (LST)\nVerano 2025", "°C")
-    ax.set_ylim(0, 48)
-    fig.text(0.5, 0.01, "Fuente: Landsat 8-9, Google Earth Engine", ha="center", va="bottom", fontsize=7, color="#666666")
+    # The label goes ABOVE the error bar. Placing it at bar height + a constant
+    # put the number on top of the whisker, which is what made it unreadable.
+    for bar, v, e in zip(bars, values, err):
+        ax.text(bar.get_x() + bar.get_width() / 2, v + e + label_pad,
+                label_fmt.format(v), ha="center", fontsize=13,
+                fontweight="bold", color=TITLE_COLOR)
+    _chart_style(ax, title, ylabel)
+    ax.set_ylim(0, max(v + e for v, e in zip(values, err)) * 1.30)
+    fig.text(0.5, 0.01, CHART_CREDIT, ha="center", va="bottom",
+             fontsize=9, color="#666666")
+    return fig
+
+
+def plot_lst_chart():
+    fig = _plot_zone_bars(
+        "lst_mean",
+        "Temperatura superficial por zona\nLandsat 8/9 · 2025–2026",
+        "°C", "{:.1f} °C", 1.4,
+    )
     _save(fig, "lst_chart_zmvm.png")
 
 
 def plot_ndvi_chart():
-    zones = ["Norte\n(nororiente)", "Centro", "Sur\n(referencia)"]
-    values = [0.12, 0.20, 0.33]
-    colors = [CHART_COLORS["norte"], CHART_COLORS["centro"], CHART_COLORS["sur"]]
-
-    fig, ax = plt.subplots(figsize=CHART_FIG_SIZE)
-    bars = ax.bar(zones, values, color=colors, width=0.55, edgecolor="white", linewidth=1.2)
-    for bar, v in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.008,
-                f"{v:.2f}", ha="center", fontsize=11, fontweight="bold", color=TITLE_COLOR)
-    _chart_style(ax, "Índice de Vegetación (NDVI)\nVerano 2025", "NDVI")
-    ax.set_ylim(0, 0.42)
-    ax.text(0.95, 0.05,
-            "Correlación LST–NDVI: r = –0.829\nA más vegetación, menor temperatura",
-            transform=ax.transAxes, ha="right", va="bottom",
-            fontsize=7.5, color="#555555",
-            bbox=dict(boxstyle="round,pad=0.3", facecolor="#f8f8f8",
-                      edgecolor="#dddddd", linewidth=0.5))
-    fig.text(0.5, 0.01, "Fuente: Landsat 8-9, Google Earth Engine", ha="center", va="bottom", fontsize=7, color="#666666")
+    fig = _plot_zone_bars(
+        "ndvi_mean",
+        "Índice de vegetación por zona\nLandsat 8/9 · 2025–2026",
+        "NDVI", "{:.3f}", 0.018,
+    )
     _save(fig, "ndvi_chart_zmvm.png")
 
 
 def plot_no2_chart():
     st = pd.read_csv(DATA / "processed" / "ground_stations_annual_2023.csv")
-    ST_META = {
-        "Nezahualcoyotl": "norte", "GAM": "norte", "Iztapalapa": "norte",
-        "Ecatepec": "norte", "Tlalnepantla": "norte", "Naucalpan": "norte",
-        "Centro": "centro", "Benito Juárez": "centro", "Hospital General": "centro",
-        "Pedregal": "sur", "CCA": "sur", "UAM Xochimilco": "sur", "Ajusco Medio": "sur",
-    }
-    no2 = st[(st["pollutant"] == "NO2") & (st["annual_mean"] > 0)].copy()
+    # A station whose 75th percentile is zero is not reporting: zeros are being
+    # counted as valid readings. Keeping those rows drags the annual mean to ~0
+    # and puts a meaningless "0.0" bar in the chart.
+    no2 = st[(st["pollutant"] == "NO2") & (st["annual_mean"] > 0)
+             & (st["p75"] > 0)].copy()
     no2["zone"] = no2["station_name"].map(ST_META)
     no2 = no2.sort_values("annual_mean")
 
@@ -566,11 +598,12 @@ def plot_no2_chart():
     ax.barh(names, vals, color=colors_bar, height=0.65, edgecolor="white", linewidth=0.8)
     for bar, v in zip(ax.containers[0], vals):
         ax.text(bar.get_width() + 0.0003, bar.get_y() + bar.get_height() / 2,
-                f"{v:.3f}", va="center", fontsize=7.5, color="#444444")
+                f"{v:.3f}", va="center", fontsize=10, color="#444444")
     _chart_style(ax, "Dióxido de Nitrógeno (NO₂)\nEstaciones SINAICA 2023", "ppm")
-    ax.set_xlabel("NO₂ (ppm)", fontsize=9, color="#444444")
-    ax.legend(handles=_chart_legend(), fontsize=8, loc="lower right")
-    fig.text(0.5, 0.01, "Fuente: SINAICA (estaciones 2023)", ha="center", va="bottom", fontsize=7, color="#666666")
+    ax.set_xlabel("NO₂ (ppm)", fontsize=11, color="#444444")
+    ax.legend(handles=_chart_legend(), fontsize=10, loc="lower right")
+    fig.subplots_adjust(bottom=0.22)
+    fig.text(0.5, 0.01, "Fuente: SINAICA (estaciones 2023)", ha="center", va="bottom", fontsize=9, color="#666666")
     _save(fig, "no2_chart_zmvm.png")
 
 
@@ -580,13 +613,11 @@ def plot_no2_chart():
 
 def plot_pm_chart():
     st = pd.read_csv(DATA / "processed" / "ground_stations_annual_2023.csv")
-    ST_META = {
-        "Nezahualcoyotl": "norte", "GAM": "norte", "Iztapalapa": "norte",
-        "Ecatepec": "norte", "Tlalnepantla": "norte", "Naucalpan": "norte",
-        "Centro": "centro", "Benito Juárez": "centro", "Hospital General": "centro",
-        "Pedregal": "sur", "CCA": "sur", "UAM Xochimilco": "sur", "Ajusco Medio": "sur",
-    }
-    pm = st[(st["pollutant"] == "PM2.5") & (st["annual_mean"] > 0)].copy()
+    # A station whose 75th percentile is zero is not reporting: zeros are being
+    # counted as valid readings. Keeping those rows drags the annual mean to ~0
+    # and puts a meaningless "0.0" bar in the chart.
+    pm = st[(st["pollutant"] == "PM2.5") & (st["annual_mean"] > 0)
+            & (st["p75"] > 0)].copy()
     pm["zone"] = pm["station_name"].map(ST_META)
     pm = pm.sort_values("annual_mean")
 
@@ -597,26 +628,25 @@ def plot_pm_chart():
     ax.barh(names, vals, color=colors_bar, height=0.65, edgecolor="white", linewidth=0.8)
     for bar, v in zip(ax.containers[0], vals):
         ax.text(bar.get_width() + 0.3, bar.get_y() + bar.get_height() / 2,
-                f"{v:.1f}", va="center", fontsize=7.5, color="#444444")
+                f"{v:.1f}", va="center", fontsize=10, color="#444444")
     ax.axvline(5, color="#c0392b", linestyle="--", linewidth=2, alpha=0.7)
-    ax.text(5.2, -0.6, "WHO (5 µg/m³)", fontsize=7.5, color="#c0392b")
+    ax.text(5.2, -0.6, "WHO (5 µg/m³)", fontsize=9, color="#c0392b")
     _chart_style(ax, "Partículas finas (PM₂.₅)\nEstaciones SINAICA 2023", "µg/m³")
-    ax.set_xlabel("µg/m³", fontsize=9, color="#444444")
+    ax.set_xlabel("µg/m³", fontsize=11, color="#444444")
     ax.set_xlim(0, max(vals) * 1.25)
-    ax.legend(handles=_chart_legend(), fontsize=8, loc="lower right")
-    fig.text(0.5, 0.01, "Fuente: SINAICA / RAMA (estaciones 2023)", ha="center", va="bottom", fontsize=7, color="#666666")
+    ax.legend(handles=_chart_legend(), fontsize=10, loc="lower right")
+    fig.subplots_adjust(bottom=0.22)
+    fig.text(0.5, 0.01, "Fuente: SINAICA / RAMA (estaciones 2023)", ha="center", va="bottom", fontsize=9, color="#666666")
     _save(fig, "pm_chart_zmvm.png")
 
 
 def plot_pm10_chart():
     st = pd.read_csv(DATA / "processed" / "ground_stations_annual_2023.csv")
-    ST_META = {
-        "Nezahualcoyotl": "norte", "GAM": "norte", "Iztapalapa": "norte",
-        "Ecatepec": "norte", "Tlalnepantla": "norte", "Naucalpan": "norte",
-        "Centro": "centro", "Benito Juárez": "centro", "Hospital General": "centro",
-        "Pedregal": "sur", "CCA": "sur", "UAM Xochimilco": "sur", "Ajusco Medio": "sur",
-    }
-    pm = st[(st["pollutant"] == "PM10") & (st["annual_mean"] > 0)].copy()
+    # A station whose 75th percentile is zero is not reporting: zeros are being
+    # counted as valid readings. Keeping those rows drags the annual mean to ~0
+    # and puts a meaningless "0.0" bar in the chart.
+    pm = st[(st["pollutant"] == "PM10") & (st["annual_mean"] > 0)
+            & (st["p75"] > 0)].copy()
     pm["zone"] = pm["station_name"].map(ST_META)
     pm = pm.sort_values("annual_mean")
 
@@ -627,14 +657,15 @@ def plot_pm10_chart():
     ax.barh(names, vals, color=colors_bar, height=0.65, edgecolor="white", linewidth=0.8)
     for bar, v in zip(ax.containers[0], vals):
         ax.text(bar.get_width() + 0.3, bar.get_y() + bar.get_height() / 2,
-                f"{v:.1f}", va="center", fontsize=7.5, color="#444444")
+                f"{v:.1f}", va="center", fontsize=10, color="#444444")
     ax.axvline(15, color="#c0392b", linestyle="--", linewidth=2, alpha=0.7)
-    ax.text(15.2, -0.6, "WHO (15 µg/m³)", fontsize=7.5, color="#c0392b")
+    ax.text(15.2, -0.6, "WHO (15 µg/m³)", fontsize=9, color="#c0392b")
     _chart_style(ax, "Partículas (PM₁₀)\nEstaciones SINAICA 2023", "µg/m³")
-    ax.set_xlabel("µg/m³", fontsize=9, color="#444444")
+    ax.set_xlabel("µg/m³", fontsize=11, color="#444444")
     ax.set_xlim(0, max(vals) * 1.25)
-    ax.legend(handles=_chart_legend(), fontsize=8, loc="lower right")
-    fig.text(0.5, 0.01, "Fuente: SINAICA / RAMA (estaciones 2023)", ha="center", va="bottom", fontsize=7, color="#666666")
+    ax.legend(handles=_chart_legend(), fontsize=10, loc="lower right")
+    fig.subplots_adjust(bottom=0.22)
+    fig.text(0.5, 0.01, "Fuente: SINAICA / RAMA (estaciones 2023)", ha="center", va="bottom", fontsize=9, color="#666666")
     _save(fig, "pm10_chart_zmvm.png")
 
 
@@ -749,7 +780,7 @@ def _surface_map(mun_gdf, state_bg, pollutant):
         0.97, -0.02,
         f"Línea base OMS\n{label}: {who_limit} {unit}/año",
         transform=ax.transAxes, ha="right", va="top",
-        fontsize=8, color="#c0392b",
+        fontsize=9, color="#c0392b",
         bbox=dict(boxstyle="round,pad=0.35", facecolor="white",
                   edgecolor="#c0392b", linewidth=1.5),
     )
