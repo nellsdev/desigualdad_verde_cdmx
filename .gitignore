@@ -11,7 +11,7 @@
 .engram/
 
 # Survey raw responses are NOT published: they contain colonia, age and occupation
-# for 38 identifiable respondents. See README section "Limitations" (item 8).
+# for 38 identifiable respondents. See README section "Limitations" (item 11).
 encuesta/encuesta-respuestas.csv
 encuesta/DosMexicosbajoSol.csv.zip
 

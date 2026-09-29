@@ -251,7 +251,10 @@ Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 0
 - Every function has a **docstring** (purpose, args, returns) and **type hints**.
 - All paths, project IDs, band names, and vis palettes are constants in `src/config.py` — no magic strings in notebooks.
 - Data is **fetched fresh** from Earth Engine and SINAICA on each run. Cached files go in `outputs/`.
-- Time conventions: NO₂ = full year 2023; LST = summer 2023 (Jun–Aug). Update `start_date` / `end_date` in notebooks to change the window.
+- Time conventions: the environmental layers are pulled for the 2025–2026 window (see the
+  `start_date` / `end_date` arguments in notebooks 01–04). The social and health layers are
+  fixed by their sources: DGIS discharges for 2023 and CONAPO marginalization for 2020.
+  Changing the environmental window is a one-line edit; changing the social window is not.
 
 ---
 
@@ -268,39 +271,71 @@ Open the notebooks in `notebooks/` and run them in order (01 → 02 → 03 → 0
 
 ## Limitations
 
-Honest scope notes. They are part of the result, not caveats to hide.
+Honest scope notes. They are part of the result, not caveats to hide. Items 1–3 are the ones
+that shaped the design; the rest bound how far the results can be pushed.
 
-1. **Two analysis levels are mixed, and they are not interchangeable.** Environmental
-   indicators (notebooks 01–04) are analysed across the full ZMVM. Social and health indicators
-   (notebooks 05–07) are analysed at two different levels: AGEB (n = 3,419) and municipality
-   (n = 21). Correlations computed at these levels are not comparable and can differ in sign.
-   Every correlation reported above states its level and n.
-2. **Small municipality sample.** With n = 21 municipalities and 7 variables, most
-   municipality-level correlations are not statistically distinguishable from zero. Those
-   values are reported for transparency, not as established effects.
-3. **Correlation is not causation.** LST, NDVI and NO₂ co-vary strongly with each other, so
+1. **Two analysis levels are used and they are not interchangeable.** Environmental indicators
+   (notebooks 01–04) are analysed across the full ZMVM. Social and health indicators are
+   analysed at two different levels: AGEB (n = 3,419) and municipality (n = 21). Correlations
+   computed at these levels answer different questions about different units, are not
+   comparable, and can differ in sign. Every correlation reported above states its level and n.
+2. **The variables are not contemporaneous.** The dataset spans 2020 to 2026:
+
+   | Layer | Period | Source |
+   |---|---|---|
+   | Land surface temperature, NDVI | 2025–2026 | Landsat 8/9 |
+   | Tropospheric NO₂ | 2025–2026 | Sentinel-5P TROPOMI |
+   | Ground PM₂.₅ / PM₁₀ | 2023 and 2025 | SINAICA |
+   | Respiratory hospital discharges | 2023 | DGIS |
+   | Marginalization index | 2020 | CONAPO (2020 census) |
+
+   The design therefore assumes that the spatial pattern of each variable is stable across that
+   window. That is defensible for surface materials and green cover, which change slowly, but it
+   is an assumption rather than a tested fact, and it is weakest for NO₂, whose spatial pattern
+   shifted with post-pandemic traffic. The marginalization index derives from the March 2020
+   census, collected at the onset of the pandemic.
+3. **The study extent changed during the project.** Notebooks 01–05 analyse the full ZMVM
+   (76 municipalities). Notebook 06 narrowed the area to a 21-municipality Periferia zone,
+   because that is where the available health and marginalization data overlap. The narrowing
+   was driven by data availability rather than by the research question, and the two extents
+   are not directly comparable.
+4. **Small municipality sample.** With n = 21 municipalities and 7 variables, most
+   municipality-level correlations are not statistically distinguishable from zero — only 7 of
+   the 21 pairs are significant at p < 0.05. Those values are reported for transparency, not as
+   established effects.
+5. **Norte / Centro / Sur is an analytical grouping, not a geography.** The three zones are a
+   balanced partition of 7 municipalities each. Only two of the seven "Centro" municipalities
+   (Cuauhtémoc and Benito Juárez) are central; the others were assigned to balance group sizes.
+   The grouping does not describe concentric urban rings and must not be read as if it did. It is
+   also not the same partition as the geographic belt used for the satellite analysis in
+   notebooks 01–04.
+6. **Correlation is not causation.** LST, NDVI and NO₂ co-vary strongly with each other, so
    their individual contributions cannot be separated without a multivariate design.
-4. **Green-area metric sensitivity.** Results change materially between total green area (m²)
+7. **Green-area metric sensitivity.** Results change materially between total green area (m²)
    and green area per capita. Total area conflates municipality size with green access;
-   per-capita is the more defensible metric and is used where stated.
-5. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
+   per-capita is the more defensible metric and is used where stated. The correlation matrix
+   uses the total, which is why the green-area row reads against the project's narrative.
+8. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
    individuals. A marginalization–health relationship that appears or disappears at one level
    may not hold at another.
-6. **Respiratory data coverage.** Hospital discharge records (DGIS, ICD-10 J00–J99) are
+9. **Respiratory data coverage.** Hospital discharge records (DGIS, ICD-10 J00–J99) are
    available only for a subset of ZMVM municipalities, which constrains the health analysis to
    the Periferia Zone and reduces the effective sample.
-7. **Zone definitions.** The three-zone partitioning (Norte / Centro / Sur) used in notebooks
-   05–07 is a balanced analytical grouping of 7 municipalities each. It does not correspond
-   exactly to the geographic belt description used for the satellite analysis in notebooks
-   01–04, and the two must not be read as the same partition.
-8. **Survey sample.** The citizen perception survey (n = 38) is a pilot and is not
-   statistically representative of the metropolitan area. No quantitative claim in this README
-   rests on it.
-9. **One figure is not yet reproduced.** The `r = −0.829` LST–NDVI correlation reported for the
-   concrete belt comes from notebook 02, which requires the satellite pipeline to re-run. It
-   cannot currently be re-derived from the exported files in this repository, and the
-   municipality-level matrix gives a different value (−0.936) for a different sample. Treat the
-   belt figure as provisional until notebook 02 is re-executed and the value is frozen.
+10. **The level of the respiratory rate has not been verified.** The population-weighted rate is
+    15,887 per 100,000 (15.9%). That is implausibly high for hospital *discharges* over a single
+    year. ICD-10 J00–J99 includes the common cold (J00) and other upper-respiratory conditions,
+    so the source figure may be counting outpatient episodes rather than discharges. This must be
+    checked against the DGIS data dictionary before any health *level* is quoted; the
+    correlation results do not depend on the level being correct, only on the ranking.
+11. **Survey sample.** The citizen perception survey (n = 38) is a pilot and is not
+    statistically representative of the metropolitan area. No quantitative claim in this README
+    rests on it.
+12. **One figure is not yet reproduced.** The `r = −0.829` LST–NDVI correlation reported for the
+    concrete belt comes from notebook 02, which samples 400 pixels through Earth Engine and does
+    not persist them. It cannot currently be re-derived from the exported files in this
+    repository, and the municipality-level matrix gives a different value (−0.936) for a
+    different sample. Treat the belt figure as provisional until the sample is written to disk
+    and the value is frozen.
 
 ---
 
