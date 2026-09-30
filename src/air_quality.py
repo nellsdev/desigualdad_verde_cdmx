@@ -508,6 +508,8 @@ def fetch_multiple_pollutants(
 def compute_annual_stats(
     df: pd.DataFrame,
     year: Optional[int] = None,
+    min_valid: int = 0,
+    min_nonzero_frac: float = 0.0,
 ) -> pd.DataFrame:
     """Compute annual statistics for each station and pollutant.
 
@@ -519,12 +521,24 @@ def compute_annual_stats(
     year : int or None
         Filter to a specific year before computing.  If None, uses all
         available data.
+    min_valid : int
+        Drop station/pollutant groups with fewer than this many valid readings.
+        A single valid hour is not an annual mean.
+    min_nonzero_frac : float
+        Drop groups where fewer than this fraction of the valid readings are
+        above zero. Some stations report a flat 0.000 series with the validity
+        flag set; a whole year of exactly 0.000 ug/m3 is physically impossible
+        in an urban basin, so it is an instrument failure rather than a
+        measurement. Occasional zeros inside an otherwise normal series are real
+        and are kept.
 
     Returns
     -------
     pd.DataFrame
         Columns: station_id, station_name, pollutant, year, annual_mean,
-        p05, p25, p50, p75, p95, max_value, count_valid, unit.
+        p05, p25, p50, p75, p95, max_value, count_valid, unit. Groups that fail
+        the thresholds are omitted, so a station that reports nothing is absent
+        from the result instead of appearing with a mean of zero.
     """
     if df.empty:
         return pd.DataFrame(
@@ -557,6 +571,17 @@ def compute_annual_stats(
     numeric = working[pd.to_numeric(working["value"], errors="coerce").notna()].copy()
     numeric["value"] = pd.to_numeric(numeric["value"], errors="coerce")
 
+    # SINAICA flags every reading with ``validoAct``, which _convert_to_dataframe
+    # exposes as ``is_valid``. The flag was being computed and then ignored, so
+    # the annual mean averaged over invalid readings too. Several stations report
+    # value = 0 with is_valid = False for most of the year, which dragged their
+    # "annual mean" to ~0 instead of reporting that they have no data.
+    if "is_valid" in numeric.columns:
+        numeric = numeric[numeric["is_valid"].fillna(False).astype(bool)].copy()
+
+    if numeric.empty:
+        return pd.DataFrame()
+
     def _stats(group: pd.DataFrame) -> dict[str, Any]:
         vals = group["value"].dropna()
         unit = group["unit"].iloc[0] if "unit" in group.columns else ""
@@ -580,7 +605,14 @@ def compute_annual_stats(
     for (sid, yr, pol), group in numeric.groupby(
         ["station_id", "year", "pollutant"], sort=False
     ):
-        results.append(_stats(group))
+        stats = _stats(group)
+        if stats["count_valid"] < min_valid:
+            continue
+        if min_nonzero_frac > 0:
+            vals = group["value"].dropna()
+            if len(vals) == 0 or float((vals > 0).mean()) < min_nonzero_frac:
+                continue
+        results.append(stats)
     result = pd.DataFrame(results)
     return result.sort_values(["station_id", "year", "pollutant"]).reset_index(drop=True)
 

@@ -55,14 +55,16 @@ The same geography that is hotter and less green also breathes more polluted air
 
 Ground-level particulate matter confirms the satellite picture — and reveals a health crisis.
 
-| Pollutant | North (mean) | Centre (mean) | South (mean) | WHO guideline |
+| Pollutant | Norte (mean) | Centro (mean) | Sur (mean) | WHO annual guideline |
 |-----------|-------------|--------------|-------------|---------------|
-| PM₂.₅ | 27.5 µg/m³ | 22.2 µg/m³ | 14.4 µg/m³ | 5 µg/m³ |
-| PM₁₀ | 54.3 µg/m³ | 45.1 µg/m³ | 32.8 µg/m³ | 15 µg/m³ |
+| PM₂.₅ | 20.2 µg/m³ | 18.3 µg/m³ | 15.9 µg/m³ | 5 µg/m³ |
+| PM₁₀ | 40.5 µg/m³ | 34.4 µg/m³ | 29.9 µg/m³ | 15 µg/m³ |
 
-- **Every single station exceeds the WHO annual guideline** for PM₂.₅ and PM₁₀.
+- **Every station with valid data exceeds the WHO annual guideline** — PM₂.₅ 13 of 13, PM₁₀ 16 of
+  16. Reaching that sentence required cleaning the series; see Limitations item 13.
 - **Gustavo A. Madero (GAM) is among the most burdened municipalities** across temperature, vegetation, NO₂, PM₂.₅ and PM₁₀ — the worst combined environmental conditions in the northern belt. On the project's full six-indicator burden score (which also includes marginalization and respiratory rate) it ranks 4th of 21; see the health section below.
-- The north-south particulate divide mirrors every other indicator exactly.
+- The north–south particulate divide holds for both pollutants, though the PM₂.₅ spread between
+  zones is narrow (4.3 µg/m³) next to the temperature gap.
 
 ### 🧭 Marginalization and the Urban Heat Divide
 
@@ -91,16 +93,51 @@ honestly matters as much as reporting the positive findings.
   Median discharge rates per 100k are 17,266 (Muy bajo), 14,153 (Bajo), 16,066 (Medio) and
   21,961 (Alto). Only the highest grade stands clearly above the others, and the ordering
   between the lower grades is not stable.
-- **Green area does not show the expected protective association.** Using total green area per
-  municipality, the correlation with respiratory rate is *positive* (r = +0.52); normalising to
-  green area per capita reduces it to near zero (r = +0.12, n = 20). The choice between total
-  area and area per person changes the answer, and neither version supports a clean protective
-  effect in this dataset.
+- **Green area, tested properly, turns out to be negligible either way** — see the next section.
+  The inventory metric was unusable outside CDMX (Limitations 7), so the question was re-run
+  with satellite NDVI, which has full coverage.
 - The integrated burden ranking (six indicators across **21** municipalities) places
   **Cuauhtémoc, Azcapotzalco and Benito Juárez** at the top — driven substantially by NO₂ from
   traffic density — rather than the northern periphery alone. The strongest and most
   consistent results in this project remain the **environmental** gradients (LST, NDVI, NO₂ and
   PM), which are mutually corroborating and measured independently of each other.
+
+### 🌿 Vegetation and Social Outcomes at AGEB Level
+
+This is the project's original question, and it had never been tested validly: the only
+per-AGEB green variable was the SEDEMA inventory, which covers just the 16 CDMX alcaldías.
+NDVI has full coverage, so it was computed for every AGEB — the mean over a 250 m buffer around
+each AGEB centroid, summer 2025 — and frozen to `dashboards/data/ndvi_ageb_2025.csv` so the
+number can be recomputed by anyone.
+
+Baseline, on the full sample:
+
+| Relationship | r | n | p | R² |
+|---|---|---|---|---|
+| NDVI ↔ marginalization (CONAPO IM_2020) | **−0.087** | 3,419 | < 0.001 | 0.8 % |
+| NDVI ↔ respiratory discharge rate | **+0.117** | 3,419 | < 0.001 | 1.4 % |
+
+**Neither survives a robustness check, and neither is worth acting on.**
+
+- **Both are negligible.** At n = 3,419 a correlation of 0.09 clears p < 0.001 without effort.
+  Vegetation explains under 1.5 % of the variance in either outcome.
+- **The health sign does not hold.** Excluding AGEBs with fewer than 1,000 residents, r moves
+  from +0.117 to −0.023 (not significant); with a 5,000 floor it is −0.267. Controlling for
+  log(population) gives −0.075. The positive baseline is a small-area artifact.
+- **The marginalization sign is method-dependent.** Pearson gives −0.087, Spearman's rank
+  correlation gives **+0.148**, and the partial correlation controlling for population gives
+  −0.140. The linear and the rank relationship point in opposite directions.
+- **The reason is a confound that this design cannot separate.** NDVI is correlated with AGEB
+  population (r = −0.217): small AGEBs are peripheral and green (mean NDVI 0.170 under 500
+  residents, against 0.098 above 5,000) and differ from dense central AGEBs in many other ways.
+- **NDVI by zone** (median): Norte 0.088 (n = 1,409), Centro **0.087** (n = 1,303), Sur 0.143
+  (n = 707). Norte and Centro are indistinguishable; only the south is meaningfully greener,
+  which is why the north–south story holds for temperature but not for everything else.
+
+The honest result is that **the original question is not answered by this design.** An areal mean
+of greenness over an AGEB conflates vegetation with density. Separating the two needs either a
+density-stratified design or a distance-based accessibility measure — how far is the nearest
+park — instead of an average over the polygon.
 
 ### 🔗 The Integrated Pattern
 
@@ -134,10 +171,20 @@ For comparative analysis, the area is divided into three zones:
 |--------|------------|---------|
 | **Landsat 8/9** (NASA–USGS) | Land Surface Temperature (LST) in °C, NDVI | Notebooks 01, 02 |
 | **Sentinel-5P TROPOMI** (ESA) | Tropospheric NO₂ column (mol/m²) | Notebook 03 |
-| **SINAICA** (INEEC) | Hourly PM₂.₅, PM₁₀, NO₂ from 13 ground monitoring stations | Notebook 04 |
+| **SINAICA** (INECC) | Hourly PM₂.₅, PM₁₀, NO₂ from 20 stations; readings flagged invalid by the source are dropped | Notebook 04 |
 | **INEGI** (Marco Geoestadístico) | Municipal boundaries (CDMX + EdoMex), AGEB-level geography | All notebooks |
 | **CONAPO** | ZMVM delimitation (76 municipios); Índice de Marginación (IM_2020) by AGEB | AOI definition, Notebooks 05, 06 |
 | **DGIS** (Secretaría de Salud) | Hospital discharges for respiratory diseases (ICD-10 J00–J99) by AGEB | Notebook 06 |
+
+Committed derivations, so every number in this README can be recomputed without re-running the
+pipeline:
+
+| File | What it holds |
+|---|---|
+| `dashboards/data/municipio_completo.csv` | per-municipality indicators behind the burden ranking |
+| `dashboards/data/ageb_data.csv` | per-AGEB marginalization, health and inventory green area |
+| `dashboards/data/ndvi_ageb_2025.csv` | **NDVI per AGEB** (250 m buffer, summer 2025) — the vegetation test |
+| `dashboards/data/correlation_matrix.csv` | the matrix plotted in the figures |
 
 ---
 
@@ -333,18 +380,33 @@ that shaped the design; the rest bound how far the results can be pushed.
    notebooks 01–04.
 6. **Correlation is not causation.** LST, NDVI and NO₂ co-vary strongly with each other, so
    their individual contributions cannot be separated without a multivariate design.
-7. **The green-area metric does not measure recreational space.** `area_verde_total_m2` sums
-   the `superficie` of every polygon in the SEDEMA green-area inventory that intersects an
-   AGEB, **with no filter on the `categoria` field**. Of the 67.3 km² summed, only 29.2% is
-   recreational (parks, alamedas, plazas, gardens); 42.3% is vegetation inside urban
-   facilities (school grounds, housing units, assistance centres) and 14.2% is road verges and
-   medians. A camellón along an avenue counts exactly as much as a park. The metric therefore
-   tracks road and facility density at least as much as it tracks green space, which is the
-   most likely reason its correlation with respiratory rate comes out *positive* (+0.522):
-   more road frontage means more traffic and worse air. Converting to per capita (+0.115) does
-   not repair the metric, only rescales it. Re-aggregating from the recreational categories
-   only — and adding distance to the nearest park as an accessibility measure — is the next
-   step, and it may change the sign.
+7. **The green-area metric is not usable outside CDMX, and does not measure recreational
+   space.** `area_verde_total_m2` sums the SEDEMA green-area inventory intersecting each AGEB,
+   with two independent defects:
+
+   *Coverage.* The inventory covers **only the 16 CDMX alcaldías** (`cve_delg` runs 1–16). The
+   five Estado de México municipios in the study area have essentially no recorded green area:
+   Coacalco 0 m², Ecatepec 5,581 m², Tlalnepantla 137,973 m² and Naucalpan 642,124 m², against a
+   median of **5.35 km² for the CDMX alcaldías**. That is a coverage gap, not an absence of
+   parks, and it invalidates any ZMVM-wide correlation involving this column. Those five
+   municipios all fall in the Norte zone.
+
+   *Category.* Of the 67.2 km² summed, only **29.3 % is recreational** (parks, alamedas, plazas,
+   gardens); 42 % is vegetation inside urban facilities (school grounds, housing units,
+   assistance centres) and 14 % is road verges and medians. A camellón along an avenue counts as
+   much as a park.
+
+   Filtering to recreational categories does flip the AGEB-level sign (+0.013 → −0.011), which
+   confirms the category defect — but every correlation remains indistinguishable from zero, and
+   the coverage gap cannot be filtered away. **`area_verde_total_m2` should not be used for the
+   21-municipality analysis.** The measure with full ZMVM coverage is **NDVI from Landsat**. At
+   municipality level it gives r = −0.301 with respiratory rate and r = −0.372 with
+   marginalization (n = 21, neither significant). Computed per AGEB instead — the test that
+   matters, because that is where the health data lives — the baseline is r = +0.117 and
+   r = −0.087 (n = 3,419), but **neither survives a robustness check**: the health sign reverses
+   under a population floor, and the marginalization sign reverses under a rank correlation. NDVI
+   is itself correlated with AGEB population (r = −0.217), so an areal mean cannot separate
+   vegetation from density. See the vegetation section above.
 8. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
    individuals. A marginalization–health relationship that appears or disappears at one level
    may not hold at another.
@@ -370,6 +432,16 @@ that shaped the design; the rest bound how far the results can be pushed.
     repository, and the municipality-level matrix gives a different value (−0.936) for a
     different sample. Treat the belt figure as provisional until the sample is written to disk
     and the value is frozen.
+13. **The PM series needed cleaning, and the cleaning is a judgement call.** SINAICA flags every
+    reading with `validoAct`, which the pipeline computed as `is_valid` and then **ignored**: the
+    annual mean averaged over invalid readings, which is why several stations reported a mean of
+    0.000 µg/m³ for a year. Filtering on the flag removes those, but not all of them — Ecatepec
+    PM₁₀ reports a flat 0.000 series with the valid flag set for all 8,760 hours, which is
+    physically impossible in this basin. The rule applied is: at least 2,190 valid readings
+    (25 % of the year), and at least 25 % of valid readings above zero. That drops exactly three
+    series — Ecatepec PM₁₀, Miguel Hidalgo PM₁₀ and Miguel Hidalgo PM₂.₅ (one valid hour each) —
+    and leaves every other station's mean unchanged. Occasional zeros inside an otherwise normal
+    series are real and are kept.
 
 ---
 
