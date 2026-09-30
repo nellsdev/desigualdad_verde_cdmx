@@ -110,21 +110,34 @@ NDVI has full coverage, so it was computed for every AGEB — the mean over a 25
 each AGEB centroid, summer 2025 — and frozen to `dashboards/data/ndvi_ageb_2025.csv` so the
 number can be recomputed by anyone.
 
+Baseline, on the full sample:
+
 | Relationship | r | n | p | R² |
 |---|---|---|---|---|
 | NDVI ↔ marginalization (CONAPO IM_2020) | **−0.087** | 3,419 | < 0.001 | 0.8 % |
 | NDVI ↔ respiratory discharge rate | **+0.117** | 3,419 | < 0.001 | 1.4 % |
 
-- **The direction is as hypothesized for marginalization** — greener AGEBs are slightly less
-  marginalized — **and opposite for health**: greener AGEBs carry slightly *higher* recorded
-  respiratory discharge rates.
-- **Both effects are negligible.** At n = 3,419 a correlation of 0.09 clears p < 0.001 without
-  effort; the significance comes from the sample size, not from the size of the effect.
-  Vegetation explains under 1.5 % of the variance in either outcome, so nothing should be
-  decided on this.
+**Neither survives a robustness check, and neither is worth acting on.**
+
+- **Both are negligible.** At n = 3,419 a correlation of 0.09 clears p < 0.001 without effort.
+  Vegetation explains under 1.5 % of the variance in either outcome.
+- **The health sign does not hold.** Excluding AGEBs with fewer than 1,000 residents, r moves
+  from +0.117 to −0.023 (not significant); with a 5,000 floor it is −0.267. Controlling for
+  log(population) gives −0.075. The positive baseline is a small-area artifact.
+- **The marginalization sign is method-dependent.** Pearson gives −0.087, Spearman's rank
+  correlation gives **+0.148**, and the partial correlation controlling for population gives
+  −0.140. The linear and the rank relationship point in opposite directions.
+- **The reason is a confound that this design cannot separate.** NDVI is correlated with AGEB
+  population (r = −0.217): small AGEBs are peripheral and green (mean NDVI 0.170 under 500
+  residents, against 0.098 above 5,000) and differ from dense central AGEBs in many other ways.
 - **NDVI by zone** (median): Norte 0.088 (n = 1,409), Centro **0.087** (n = 1,303), Sur 0.143
   (n = 707). Norte and Centro are indistinguishable; only the south is meaningfully greener,
   which is why the north–south story holds for temperature but not for everything else.
+
+The honest result is that **the original question is not answered by this design.** An areal mean
+of greenness over an AGEB conflates vegetation with density. Separating the two needs either a
+density-stratified design or a distance-based accessibility measure — how far is the nearest
+park — instead of an average over the polygon.
 
 ### 🔗 The Integrated Pattern
 
@@ -389,8 +402,11 @@ that shaped the design; the rest bound how far the results can be pushed.
    21-municipality analysis.** The measure with full ZMVM coverage is **NDVI from Landsat**. At
    municipality level it gives r = −0.301 with respiratory rate and r = −0.372 with
    marginalization (n = 21, neither significant). Computed per AGEB instead — the test that
-   matters, because that is where the health data lives — it gives r = +0.117 and r = −0.087
-   (n = 3,419, both p < 0.001 and both negligible; see the vegetation section above).
+   matters, because that is where the health data lives — the baseline is r = +0.117 and
+   r = −0.087 (n = 3,419), but **neither survives a robustness check**: the health sign reverses
+   under a population floor, and the marginalization sign reverses under a rank correlation. NDVI
+   is itself correlated with AGEB population (r = −0.217), so an areal mean cannot separate
+   vegetation from density. See the vegetation section above.
 8. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
    individuals. A marginalization–health relationship that appears or disappears at one level
    may not hold at another.
