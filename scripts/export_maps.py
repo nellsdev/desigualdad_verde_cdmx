@@ -504,6 +504,12 @@ from src.stations import STATIONS_META  # noqa: E402
 
 ST_META = {name: meta["zone"] for name, meta in STATIONS_META.items()}
 
+# No zero-handling lives here any more. compute_annual_stats drops readings the
+# source flags invalid and series whose 75th percentile is zero, so the CSV this
+# module reads already contains only real measurements. The three filtering
+# guards that used to sit in the chart functions were an ad-hoc workaround for
+# that upstream bug; keeping them would hide it if it ever came back.
+
 
 def _chart_legend():
     return [
@@ -583,11 +589,7 @@ def plot_ndvi_chart():
 
 def plot_no2_chart():
     st = pd.read_csv(DATA / "processed" / "ground_stations_annual_2023.csv")
-    # A station whose 75th percentile is zero is not reporting: zeros are being
-    # counted as valid readings. Keeping those rows drags the annual mean to ~0
-    # and puts a meaningless "0.0" bar in the chart.
-    no2 = st[(st["pollutant"] == "NO2") & (st["annual_mean"] > 0)
-             & (st["p75"] > 0)].copy()
+    no2 = st[st["pollutant"] == "NO2"].copy()
     no2["zone"] = no2["station_name"].map(ST_META)
     no2 = no2.sort_values("annual_mean")
 
@@ -613,11 +615,7 @@ def plot_no2_chart():
 
 def plot_pm_chart():
     st = pd.read_csv(DATA / "processed" / "ground_stations_annual_2023.csv")
-    # A station whose 75th percentile is zero is not reporting: zeros are being
-    # counted as valid readings. Keeping those rows drags the annual mean to ~0
-    # and puts a meaningless "0.0" bar in the chart.
-    pm = st[(st["pollutant"] == "PM2.5") & (st["annual_mean"] > 0)
-            & (st["p75"] > 0)].copy()
+    pm = st[st["pollutant"] == "PM2.5"].copy()
     pm["zone"] = pm["station_name"].map(ST_META)
     pm = pm.sort_values("annual_mean")
 
@@ -642,11 +640,7 @@ def plot_pm_chart():
 
 def plot_pm10_chart():
     st = pd.read_csv(DATA / "processed" / "ground_stations_annual_2023.csv")
-    # A station whose 75th percentile is zero is not reporting: zeros are being
-    # counted as valid readings. Keeping those rows drags the annual mean to ~0
-    # and puts a meaningless "0.0" bar in the chart.
-    pm = st[(st["pollutant"] == "PM10") & (st["annual_mean"] > 0)
-            & (st["p75"] > 0)].copy()
+    pm = st[st["pollutant"] == "PM10"].copy()
     pm["zone"] = pm["station_name"].map(ST_META)
     pm = pm.sort_values("annual_mean")
 
