@@ -215,9 +215,8 @@ st.image(
 
 st.image(
     str(MAPAS / "pm_chart_zmvm.png"),
-    caption="PM₂.₅ en las estaciones SINAICA que reportan datos. Todas superan el límite "
-    "anual de la OMS de 5 µg/m³. Varias estaciones del registro original reportan 0.000 en "
-    "más de la mitad del año: ver la sección 6.",
+    caption="PM₂.₅ en las estaciones SINAICA que reportan datos. Las 13 superan el límite "
+    "anual de la OMS de 5 µg/m³.",
     width="stretch",
 )
 
@@ -427,12 +426,13 @@ st.markdown(
        es de 15,887 por 100 mil (15.9 %), demasiado alta para egresos hospitalarios en un año.
        J00–J99 incluye el resfrío común, así que la fuente puede estar contando consultas.
        Las correlaciones no dependen de que el nivel sea correcto; las cifras de nivel, sí.
-    6. **El registro de PM arrastra ceros que no son mediciones.** 31 de las 60 filas
-       estación-contaminante tienen media anual por debajo de 0.5 µg/m³, con mediana y
-       percentil 75 en 0.000 pero miles de observaciones contadas como válidas. Tláhuac,
-       Naucalpan y Ecatepec reportan media anual 0.000. Cualquier promedio que los incluya
-       queda sesgado hacia abajo, y los promedios por municipio del repositorio todavía los
-       incluyen: las cifras de PM por zona no son confiables hasta corregirlo.
+    6. **El registro de PM necesitó limpieza, y la limpieza es un criterio.** SINAICA marca cada
+       lectura con `validoAct`; el pipeline lo calculaba y **lo ignoraba**, así que promediaba
+       lecturas inválidas y varias estaciones quedaban con media anual 0.000. Filtrar por la
+       bandera no alcanza: Ecatepec PM₁₀ reporta 0.000 en las 8.760 horas del año con la bandera
+       de válido puesta. Se aplican dos umbrales — al menos 2.190 lecturas válidas y al menos
+       25 % de ellas sobre cero — que descartan tres series de 52 y no mueven ninguna otra. Los
+       promedios por municipio ya se calcularon con las series limpias.
     7. **La encuesta es un piloto.** 34 respuestas en 16 municipios, mediana de 2 por municipio.
        No es representativa y ningún resultado cuantitativo de esta página se apoya en ella.
     """
