@@ -55,14 +55,16 @@ The same geography that is hotter and less green also breathes more polluted air
 
 Ground-level particulate matter confirms the satellite picture — and reveals a health crisis.
 
-| Pollutant | North (mean) | Centre (mean) | South (mean) | WHO guideline |
+| Pollutant | Norte (mean) | Centro (mean) | Sur (mean) | WHO annual guideline |
 |-----------|-------------|--------------|-------------|---------------|
-| PM₂.₅ | 27.5 µg/m³ | 22.2 µg/m³ | 14.4 µg/m³ | 5 µg/m³ |
-| PM₁₀ | 54.3 µg/m³ | 45.1 µg/m³ | 32.8 µg/m³ | 15 µg/m³ |
+| PM₂.₅ | 20.2 µg/m³ | 18.3 µg/m³ | 15.9 µg/m³ | 5 µg/m³ |
+| PM₁₀ | 40.5 µg/m³ | 34.4 µg/m³ | 29.9 µg/m³ | 15 µg/m³ |
 
-- **Every single station exceeds the WHO annual guideline** for PM₂.₅ and PM₁₀.
+- **Every station with valid data exceeds the WHO annual guideline** — PM₂.₅ 13 of 13, PM₁₀ 16 of
+  16. Reaching that sentence required cleaning the series; see Limitations item 13.
 - **Gustavo A. Madero (GAM) is among the most burdened municipalities** across temperature, vegetation, NO₂, PM₂.₅ and PM₁₀ — the worst combined environmental conditions in the northern belt. On the project's full six-indicator burden score (which also includes marginalization and respiratory rate) it ranks 4th of 21; see the health section below.
-- The north-south particulate divide mirrors every other indicator exactly.
+- The north–south particulate divide holds for both pollutants, though the PM₂.₅ spread between
+  zones is narrow (4.3 µg/m³) next to the temperature gap.
 
 ### 🧭 Marginalization and the Urban Heat Divide
 
@@ -382,6 +384,16 @@ that shaped the design; the rest bound how far the results can be pushed.
     repository, and the municipality-level matrix gives a different value (−0.936) for a
     different sample. Treat the belt figure as provisional until the sample is written to disk
     and the value is frozen.
+13. **The PM series needed cleaning, and the cleaning is a judgement call.** SINAICA flags every
+    reading with `validoAct`, which the pipeline computed as `is_valid` and then **ignored**: the
+    annual mean averaged over invalid readings, which is why several stations reported a mean of
+    0.000 µg/m³ for a year. Filtering on the flag removes those, but not all of them — Ecatepec
+    PM₁₀ reports a flat 0.000 series with the valid flag set for all 8,760 hours, which is
+    physically impossible in this basin. The rule applied is: at least 2,190 valid readings
+    (25 % of the year), and at least 25 % of valid readings above zero. That drops exactly three
+    series — Ecatepec PM₁₀, Miguel Hidalgo PM₁₀ and Miguel Hidalgo PM₂.₅ (one valid hour each) —
+    and leaves every other station's mean unchanged. Occasional zeros inside an otherwise normal
+    series are real and are kept.
 
 ---
 
