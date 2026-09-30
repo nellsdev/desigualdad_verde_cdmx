@@ -93,16 +93,38 @@ honestly matters as much as reporting the positive findings.
   Median discharge rates per 100k are 17,266 (Muy bajo), 14,153 (Bajo), 16,066 (Medio) and
   21,961 (Alto). Only the highest grade stands clearly above the others, and the ordering
   between the lower grades is not stable.
-- **Green area does not show the expected protective association.** Using total green area per
-  municipality, the correlation with respiratory rate is *positive* (r = +0.52); normalising to
-  green area per capita reduces it to near zero (r = +0.12, n = 20). The choice between total
-  area and area per person changes the answer, and neither version supports a clean protective
-  effect in this dataset.
+- **Green area, tested properly, turns out to be negligible either way** — see the next section.
+  The inventory metric was unusable outside CDMX (Limitations 7), so the question was re-run
+  with satellite NDVI, which has full coverage.
 - The integrated burden ranking (six indicators across **21** municipalities) places
   **Cuauhtémoc, Azcapotzalco and Benito Juárez** at the top — driven substantially by NO₂ from
   traffic density — rather than the northern periphery alone. The strongest and most
   consistent results in this project remain the **environmental** gradients (LST, NDVI, NO₂ and
   PM), which are mutually corroborating and measured independently of each other.
+
+### 🌿 Vegetation and Social Outcomes at AGEB Level
+
+This is the project's original question, and it had never been tested validly: the only
+per-AGEB green variable was the SEDEMA inventory, which covers just the 16 CDMX alcaldías.
+NDVI has full coverage, so it was computed for every AGEB — the mean over a 250 m buffer around
+each AGEB centroid, summer 2025 — and frozen to `dashboards/data/ndvi_ageb_2025.csv` so the
+number can be recomputed by anyone.
+
+| Relationship | r | n | p | R² |
+|---|---|---|---|---|
+| NDVI ↔ marginalization (CONAPO IM_2020) | **−0.087** | 3,419 | < 0.001 | 0.8 % |
+| NDVI ↔ respiratory discharge rate | **+0.117** | 3,419 | < 0.001 | 1.4 % |
+
+- **The direction is as hypothesized for marginalization** — greener AGEBs are slightly less
+  marginalized — **and opposite for health**: greener AGEBs carry slightly *higher* recorded
+  respiratory discharge rates.
+- **Both effects are negligible.** At n = 3,419 a correlation of 0.09 clears p < 0.001 without
+  effort; the significance comes from the sample size, not from the size of the effect.
+  Vegetation explains under 1.5 % of the variance in either outcome, so nothing should be
+  decided on this.
+- **NDVI by zone** (median): Norte 0.088 (n = 1,409), Centro **0.087** (n = 1,303), Sur 0.143
+  (n = 707). Norte and Centro are indistinguishable; only the south is meaningfully greener,
+  which is why the north–south story holds for temperature but not for everything else.
 
 ### 🔗 The Integrated Pattern
 
@@ -136,10 +158,20 @@ For comparative analysis, the area is divided into three zones:
 |--------|------------|---------|
 | **Landsat 8/9** (NASA–USGS) | Land Surface Temperature (LST) in °C, NDVI | Notebooks 01, 02 |
 | **Sentinel-5P TROPOMI** (ESA) | Tropospheric NO₂ column (mol/m²) | Notebook 03 |
-| **SINAICA** (INEEC) | Hourly PM₂.₅, PM₁₀, NO₂ from 13 ground monitoring stations | Notebook 04 |
+| **SINAICA** (INECC) | Hourly PM₂.₅, PM₁₀, NO₂ from 20 stations; readings flagged invalid by the source are dropped | Notebook 04 |
 | **INEGI** (Marco Geoestadístico) | Municipal boundaries (CDMX + EdoMex), AGEB-level geography | All notebooks |
 | **CONAPO** | ZMVM delimitation (76 municipios); Índice de Marginación (IM_2020) by AGEB | AOI definition, Notebooks 05, 06 |
 | **DGIS** (Secretaría de Salud) | Hospital discharges for respiratory diseases (ICD-10 J00–J99) by AGEB | Notebook 06 |
+
+Committed derivations, so every number in this README can be recomputed without re-running the
+pipeline:
+
+| File | What it holds |
+|---|---|
+| `dashboards/data/municipio_completo.csv` | per-municipality indicators behind the burden ranking |
+| `dashboards/data/ageb_data.csv` | per-AGEB marginalization, health and inventory green area |
+| `dashboards/data/ndvi_ageb_2025.csv` | **NDVI per AGEB** (250 m buffer, summer 2025) — the vegetation test |
+| `dashboards/data/correlation_matrix.csv` | the matrix plotted in the figures |
 
 ---
 
@@ -354,11 +386,11 @@ that shaped the design; the rest bound how far the results can be pushed.
    Filtering to recreational categories does flip the AGEB-level sign (+0.013 → −0.011), which
    confirms the category defect — but every correlation remains indistinguishable from zero, and
    the coverage gap cannot be filtered away. **`area_verde_total_m2` should not be used for the
-   21-municipality analysis.** The green measure with full ZMVM coverage is **NDVI from Landsat**,
-   and it is what this README uses: r = −0.301 with respiratory rate and r = −0.372 with
-   marginalization — both in the expected direction, neither significant at n = 21. **No
-   AGEB-level green–health test has been run validly**, because the only green variable available
-   per AGEB is the inventory one.
+   21-municipality analysis.** The measure with full ZMVM coverage is **NDVI from Landsat**. At
+   municipality level it gives r = −0.301 with respiratory rate and r = −0.372 with
+   marginalization (n = 21, neither significant). Computed per AGEB instead — the test that
+   matters, because that is where the health data lives — it gives r = +0.117 and r = −0.087
+   (n = 3,419, both p < 0.001 and both negligible; see the vegetation section above).
 8. **Ecological fallacy risk.** AGEB- and municipality-level associations do not describe
    individuals. A marginalization–health relationship that appears or disappears at one level
    may not hold at another.
